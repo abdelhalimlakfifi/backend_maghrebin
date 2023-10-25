@@ -1,5 +1,7 @@
+// middleware/authMiddleware.js
 const passport = require('passport');
 
+// Handel Specific Errors
 const authenticateToken = (req, res, next) => {
   passport.authenticate('jwt', { session: false }, (err, user, info) => {
     if (err) {

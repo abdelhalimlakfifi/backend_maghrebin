@@ -2,10 +2,11 @@ const express = require('express');
 const mongoose = require('mongoose');
 require('dotenv').config();
 const app = express();
+const morgan = require('morgan');
 const roleRoute = require('./routes/backoffice/roles.route')
 
 
-
+app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 

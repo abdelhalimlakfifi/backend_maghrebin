@@ -24,8 +24,9 @@ const userSchema = new mongoose.Schema({
         unique: true
     },
     role: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Role',
+        // type: mongoose.Schema.Types.ObjectId,
+        // ref: 'Role',
+        type: String, // just for testing
         required: true
     },
     profile_picture: {
@@ -41,59 +42,6 @@ const userSchema = new mongoose.Schema({
             type: Number
         }
     }],
-    login_history: [{
-        ip: {
-            type: String,
-            required: false
-        },
-        device: {
-            type: String,
-            required: false
-        },
-        browser: {
-            type: String,
-            required: false
-        },
-        os: {
-            type: String,
-            required: false
-        },
-        created_at: {
-            type: Date,
-            required: false
-        }
-    }],
-    valid_account: {
-        type: Boolean,
-        default: true
-    },
-    created_at: {
-        type: Date,
-        default: Date.now
-    },
-    created_by: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        default: null
-    },
-    updated_at: {
-        type: Date,
-        default: null
-    },
-    updated_by: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        default: null
-    },
-    deleted_at: {
-        type: Date,
-        default: null
-    },
-    deleted_by: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        default: null
-    }
 });
 
 const User = mongoose.model('User', userSchema);

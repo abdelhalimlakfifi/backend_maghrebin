@@ -1,31 +1,8 @@
 // controllers/authController.js
-const passport = require("passport");
-const JwtStrategy = require("passport-jwt").Strategy;
-const ExtractJwt = require("passport-jwt").ExtractJwt;
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
-
-const jwtOptions = {
-  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-  secretOrKey: process.env.JWT_SECRET,
-};
-
-passport.use(
-  new JwtStrategy(jwtOptions, async (jwtPayload, done) => {
-    try {
-      const user = await User.findById(jwtPayload.id);
-
-      if (!user) {
-        return done(null, false);
-      }
-
-      return done(null, user);
-    } catch (error) {
-      return done(error, false);
-    }
-  })
-);
+const passport = require("../config/passport");
 
 const loginUser = async (req, res) => {
   const { username, password } = req.body;
@@ -34,14 +11,13 @@ const loginUser = async (req, res) => {
     const user = await User.findOne({ username });
 
     if (!user) {
-      return res.sendStatus(401); 
+      return res.status(401).json({ error: "User not found" });
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
-      return res.sendStatus(401); 
-    }
+      return res.status(401).json({ error: "Invalid password" });    }
 
     const token = jwt.sign(
       { id: user._id, username: user.username },
@@ -51,8 +27,7 @@ const loginUser = async (req, res) => {
 
     return res.json({ token, role: user.role });
   } catch (error) {
-    return res.status(500).json({ error: "Internal Server Error" });
-  }
+    return res.status(500).json({ error: "Internal Server Error" });  }
 };
 
 module.exports = {

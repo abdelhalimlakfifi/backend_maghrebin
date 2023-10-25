@@ -3,7 +3,7 @@ const Role = require('../../models/roleModel')
 const Permission = require('../../models/permissionModel');
 const { body, validationResult} = require('express-validator')
 require('dotenv').config();
-
+const mongoose = require('mongoose')
 
 
 const isFieldUnique = async(value, field) => {
@@ -28,18 +28,29 @@ const storingValidation = [
 ];
 
 
+const updatingValidation = [
+    body('role')
+        .notEmpty(),
+    body('permissions')
+        .notEmpty()
+        .custom(value => {
+            if (Array.isArray(value) && value.length === 0) {
+                throw new Error('permissions field must not be empty');
+            }
+            return true;
+        }),
+];
+
+
 const getAll = async (req, res) => {
 
     try {
-        const roles = await Role.find();
+        const roles = await Role.find({ deletedAt: null }).populate('permissions').exec();
         res.json(roles);
     } catch (error) {
         res.json(internalError());
     }
 }
-
-
-
 
 
 const store = async (req, res) => {
@@ -77,7 +88,7 @@ const getOne = async (req, res) =>{
 
     try {
         
-        const permission  = await Role.findOne({ role: req.params.rolename}).populate('permissions').exec();
+        const permission  = await Role.findOne({  $and: [{role: req.params.rolename}, {deletedAt:null}]}).populate('permissions').exec();
 
         if(!permission){
             res.status(404)
@@ -103,9 +114,11 @@ const search = async (req, res) => {
     try {
         const role = await Role.find({
             $or: [
-                { role: { $regex: query, $options: 'i' } }
+                { role: { $regex: query, $options: 'i' } },
+                
             ],
-        });
+            deletedAt: null,
+        }).populate('permissions').exec();
 
 
         if(role.length === 0){
@@ -124,7 +137,96 @@ const search = async (req, res) => {
 }
 
 
+const update = async (req, res) => {
+    const roleData = req.body;
+    const id = req.params.id;
+
+
+    try {
+        const errors = validationResult(req);
+        console.log(errors);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+
+
+        
+        // get all permissions from Database. (To get the ids);
+        const permissions = await Permission.find({ label: {$in: roleData.permissions}})
 
 
 
-module.exports = { getAll, store, getOne, search, storingValidation }
+        const role = await Role.findById(id);
+
+        // Validate if role exist
+        if(!role){
+            res.status(404);
+            res.json({
+                status: 404,
+                message:"Role not found"
+            });
+            return
+        }
+
+        // validate if role name repeated
+        if(role.role !== roleData.role){
+            const sameName = await Role.findOne({ $and:[{ role: roleData}, {_id: id}] })
+            if(sameName){
+                res.json({
+                    status: 401,
+                    message:"This role already exists."
+                });
+
+                return
+            }
+        }
+
+        role.role= roleData.role;
+        role.permissions = permissions.map(permission => permission._id);
+        await role.save();
+
+        res.json({
+            data: role,
+            statu: 200
+        });
+        
+    } catch (error) {
+        res.json(internalError());
+    }
+}
+
+const destroy = async (req, res) => {
+    const identifier = req.params.identifier; // Accept either _id or roleName as a parameter
+    let role;
+
+    // Check if the identifier is a valid MongoDB ObjectId (which suggests it's an _id)
+    if (mongoose.Types.ObjectId.isValid(identifier)) {
+        role = await Role.findById(identifier);
+    } else {
+      // If it's not a valid ObjectId, treat it as a roleName
+        role = await Role.findOne({ role: identifier });
+    }
+    try {
+        if (!role) {
+            return res.status(404).json({
+                status: 404,
+                message: "Role not found",
+            });
+        }
+      // You may want to perform additional checks here before deleting, such as checking if it's associated with other data.
+
+        await role.softDelete();
+
+        res.json({
+            status: 200,
+            message: "Role deleted successfully",
+        });
+    } catch (error) {
+        res.status(500).json(internalError("", error));
+    }
+};
+
+
+
+
+module.exports = { getAll, store, getOne, search, update,destroy, storingValidation, updatingValidation }

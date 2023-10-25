@@ -16,10 +16,10 @@ router.get('/getone/:rolename', roleController.getOne);
 router.get('/:search', roleController.search);
 
 // update
-
+router.put('/update/:id',roleController.updatingValidation, roleController.update);
 
 // delete
-
+router.delete('/delete/:identifier', roleController.destroy);
 
 
 module.exports=router;

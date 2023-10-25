@@ -9,8 +9,8 @@ function internalError(errorMessage = "Internal Server Error", error){
             message: errorMessage
         }
 
-        throw error
     }
+    throw error
 }
 
 

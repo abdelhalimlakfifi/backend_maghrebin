@@ -2,7 +2,7 @@ const {internalError} = require('../../utils/500');
 const Role = require('../../models/roleModel')
 const Permission = require('../../models/permissionModel');
 const { body, validationResult} = require('express-validator')
-
+require('dotenv').config();
 
 
 
@@ -108,9 +108,18 @@ const search = async (req, res) => {
         });
 
 
+        if(role.length === 0){
+            res.status(404);
+            res.json({
+                statu: 404,
+                message:"No role founded"
+            });
+            return
+        }
+
         res.json(role);
     } catch (error) {
-        res.json(internalError());
+        res.json(internalError("", error));
     }
 }
 

@@ -8,8 +8,12 @@ router.get("/", roleController.getAll);
 // Post
 router.post('/store',roleController.storingValidation, roleController.store);
 
-// edit
+// get one
+router.get('/getone/:rolename', roleController.getOne);
 
+
+// search
+router.get('/:search', roleController.search);
 
 // update
 

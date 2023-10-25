@@ -6,7 +6,7 @@ const cors = require("cors");
 const connectDB = require("./config/db");
 
 const authRoutes = require("./routes/authRoutes");
-const userRoutes = require("./routes/userRoutes");
+const adminRoutes = require("./routes/adminRoutes");
 const customerRoutes = require("./routes/customerRoutes");
 const homeRoutes = require("./routes/homeRoutes");
 
@@ -24,7 +24,7 @@ connectDB();
 
 
 app.use("/", homeRoutes);
-app.use("/",  authRoutes, userRoutes, customerRoutes);
+app.use("/",  authRoutes, adminRoutes, customerRoutes);
 
 
 app.listen(port, () => {

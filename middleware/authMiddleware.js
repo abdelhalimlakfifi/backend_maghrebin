@@ -26,8 +26,8 @@ const authorizeCustomer = (req, res, next) => {
   }
 };
 
-const authorizeUser = (req, res, next) => {
-  if (req.user.role === 'user') {
+const authorizeAdmin = (req, res, next) => {
+  if (req.user.role === 'admin') {
     next();
   } else {
     return res.status(403).json({ error: 'You do not have access to this route' });
@@ -37,5 +37,5 @@ const authorizeUser = (req, res, next) => {
 module.exports = {
   authenticateToken,
   authorizeCustomer,
-  authorizeUser,
+  authorizeAdmin,
 };

@@ -4,21 +4,12 @@ const Permission = require('../../models/permissionModel');
 const { body, validationResult} = require('express-validator')
 
 
+
+
 const isFieldUnique = async(value, field) => {
     const existingRole = await Role.findOne({[field]: value});
     if(existingRole){
         return Promise.reject(`Role name already exist`)
-    }
-}
-
-
-const getAll = async (req, res) => {
-
-    try {
-        const roles = await Role.find();
-        res.json(roles);
-    } catch (error) {
-        res.json(internalError());
     }
 }
 
@@ -35,6 +26,19 @@ const storingValidation = [
             return true;
         }),
 ];
+
+
+const getAll = async (req, res) => {
+
+    try {
+        const roles = await Role.find();
+        res.json(roles);
+    } catch (error) {
+        res.json(internalError());
+    }
+}
+
+
 
 
 
@@ -69,10 +73,49 @@ const store = async (req, res) => {
 }
 
 
+const getOne = async (req, res) =>{
+
+    try {
+        
+        const permission  = await Role.findOne({ role: req.params.rolename}).populate('permissions').exec();
+
+        if(!permission){
+            res.status(404)
+            res.json({
+                message: "Role not found",
+                status: 404
+            });
+
+            return 
+        }
+
+
+        res.json(permission);
+
+    } catch (error) {
+        res.json(internalError());
+    }
+}
+
+
+const search = async (req, res) => {
+    const query = req.params.search;
+    try {
+        const role = await Role.find({
+            $or: [
+                { role: { $regex: query, $options: 'i' } }
+            ],
+        });
+
+
+        res.json(role);
+    } catch (error) {
+        res.json(internalError());
+    }
+}
 
 
 
 
 
-
-module.exports = { getAll, store, storingValidation }
+module.exports = { getAll, store, getOne, search, storingValidation }

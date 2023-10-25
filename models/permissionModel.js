@@ -4,7 +4,8 @@ const permessionSchema = new mongoose.Schema(
     {
         label:{
             type: String,
-            required: true
+            required: true,
+            unique: true
         }, 
     },
     {timestamps: true }

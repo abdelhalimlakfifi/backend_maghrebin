@@ -12,6 +12,7 @@ const authRoutes = require("./routes/backoffice/authRoutes");
 const adminRoutes = require("./routes/backoffice/adminRoutes");
 const roleRoute = require('./routes/backoffice/roles.route')
 const categorieRoute = require('./routes/backoffice/categorie.route');
+connectDB();
 
 app.use(morgan('dev'));
 app.use(express.json());
@@ -24,7 +25,6 @@ const port = process.env.PORT
 
 
 // Connect to MongoDB
-connectDB();
 
 
 app.use("/api/",  authRoutes, adminRoutes);

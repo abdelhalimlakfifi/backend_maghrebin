@@ -18,24 +18,24 @@ const authenticateToken = (req, res, next) => {
   })(req, res, next);
 };
 
-const authorizeCustomer = (req, res, next) => {
-  if (req.user.role === 'customer') {
-    next();
-  } else {
-    return res.status(403).json({ error: 'You do not have access to this route' });
-  }
-};
+// const authorizeCustomer = (req, res, next) => {
+//   if (req.user.role === 'customer') {
+//     next();
+//   } else {
+//     return res.status(403).json({ error: 'You do not have access to this route' });
+//   }
+// };
 
-const authorizeAdmin = (req, res, next) => {
-  if (req.user.role === 'admin') {
-    next();
-  } else {
-    return res.status(403).json({ error: 'You do not have access to this route' });
-  }
-};
+// const authorizeAdmin = (req, res, next) => {
+//   if (req.user.role === 'admin') {
+//     next();
+//   } else {
+//     return res.status(403).json({ error: 'You do not have access to this route' });
+//   }
+// };
 
 module.exports = {
   authenticateToken,
-  authorizeCustomer,
-  authorizeAdmin,
+  // authorizeCustomer,
+  // authorizeAdmin,
 };

@@ -6,6 +6,7 @@ const { getAdmin } = require('../controllers/adminController');
 
 const router = express.Router();
 
-router.get('/admin', authenticateToken, passport.authenticate('jwt', { session: false }), authorizeAdmin, getAdmin);
+router.get('/admin', authenticateToken, passport.authenticate('jwt', { session: false }), getAdmin);
+// authorizeAdmin,
 
 module.exports = router;

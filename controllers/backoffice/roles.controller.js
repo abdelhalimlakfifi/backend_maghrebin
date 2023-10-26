@@ -6,17 +6,12 @@ require('dotenv').config();
 const mongoose = require('mongoose')
 
 
-const isFieldUnique = async(value, field) => {
-    const existingRole = await Role.findOne({[field]: value});
-    if(existingRole){
-        return Promise.reject(`Role name already exist`)
-    }
-}
+
 
 const storingValidation = [
     body('role')
-        .notEmpty()
-        .custom(value => isFieldUnique(value, 'role')),
+        .notEmpty(),
+        
     body('permissions')
         .notEmpty()
         .custom(value => {
@@ -55,12 +50,19 @@ const getAll = async (req, res) => {
 
 const store = async (req, res) => {
     let roleData = req.body;
+
+    const existingRole = await Role.findOne({ role: roleData.role, deletedAt: { $ne: null } });
+
+    if (existingRole) {
+        await existingRole.deleteOne();
+    }
     
     try {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });
         }
+
         
         // get all permissions from Database. (To get the ids);
         const permissions = await Permission.find({ label: {$in: roleData.permissions}})

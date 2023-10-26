@@ -1,17 +1,14 @@
 const mongoose = require('mongoose');
 const Permission = require('../models/permissionModel');
 require('dotenv').config();
+const connectDB = require('../config/db');
+
+
+connectDB();
 
 
 
-mongoose.connect(`${process.env.DB_URL}/${process.env.DB_NAME}`);
-
-const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'MongoDB connection error:'));   
-
-
-
-const permissionDara = [
+const permissionData = [
     // role
     { label: 'role-add' },
     { label: 'role-edit' },
@@ -86,7 +83,7 @@ const permissionDara = [
 ];
 
 
-Permission.insertMany(permissionDara)
+Permission.insertMany(permissionData)
     .then(() => {
         console.log("Data seeded successfully");
     })

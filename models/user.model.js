@@ -24,9 +24,9 @@ const userSchema = new mongoose.Schema({
         unique: true
     },
     role: {
-        // type: mongoose.Schema.Types.ObjectId,
-        // ref: 'Role',
-        type: String, // just for testing
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Role',
+        //type: String, // just for testing
         required: true
     },
     profile_picture: {

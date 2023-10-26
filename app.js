@@ -8,10 +8,8 @@ const bodyParser = require("body-parser");
 const helmet = require("helmet");
 const cors = require("cors");
 const connectDB = require("./config/db");
-const authRoutes = require("./routes/authRoutes");
-const adminRoutes = require("./routes/adminRoutes");
-const customerRoutes = require("./routes/customerRoutes");
-const homeRoutes = require("./routes/homeRoutes");
+const authRoutes = require("./routes/backoffice/authRoutes");
+const adminRoutes = require("./routes/backoffice/adminRoutes");
 const roleRoute = require('./routes/backoffice/roles.route')
 const categorieRoute = require('./routes/backoffice/categorie.route');
 
@@ -29,8 +27,7 @@ const port = process.env.PORT
 connectDB();
 
 
-app.use("/api/", homeRoutes);
-app.use("/api/",  authRoutes, adminRoutes, customerRoutes);
+app.use("/api/",  authRoutes, adminRoutes);
 app.use('/api/role', roleRoute);
 app.use('/api/categorie', categorieRoute);
 

@@ -1,7 +1,7 @@
 // authRoutes.js
 const express = require('express');
 const passport = require('passport');
-const { authenticateToken, authorizeAdmin} = require('../../middleware/authMiddleware');
+const { authenticateToken } = require('../../middleware/authMiddleware');
 const { getAdmin } = require("../../controllers/backoffice/admin.controller"); 
 
 const router = express.Router();

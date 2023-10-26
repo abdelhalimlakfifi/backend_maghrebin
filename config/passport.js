@@ -14,6 +14,7 @@ const jwtOptions = {
 passport.use(
   new JwtStrategy(jwtOptions, async (jwtPayload, done) => {
     try {
+      console.log("hey from passport");
       // Attempt to find a user in the database by their ID extracted from the JWT payload
       const user = await User.findById(jwtPayload.id);
 

@@ -6,10 +6,12 @@ const authenticateToken = (req, res, next) => {
 
     
     passport.authenticate('jwt', { session: false }, (err, user, info) => {
+
+        
         if (err) {
             return res.status(500).json({ error: 'Authentication Error' });
         }
-        console.log(user)   ;
+        
         if (!user) {
             if (info && info.name === 'TokenExpiredError') {
                 return res.status(401).json({ error: 'Token has expired' });

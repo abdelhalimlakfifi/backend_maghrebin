@@ -13,6 +13,12 @@ const categorieSchema = new mongoose.Schema(
             require:true,
             default: true
         },
+        subcategorie: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'SubCategorie'
+            }
+        ],
         createdBy: {
             type: mongoose.Schema.Types.ObjectId,
             ref:'User'

@@ -1,7 +1,7 @@
 const Categorie = require('../../models/categorie.model');
 const { internalError } = require('../../utils/500');
 const { body, validationResult} = require('express-validator')
-
+const mongoose = require('mongoose');
 
 const storingValidation = [
     body('categorieName').notEmpty()
@@ -146,6 +146,7 @@ const update = async (req, res) => {
 
         }
         categorie.categorieName = req.body.categorieName;
+        categorie.updatedBy = req.user._id
         await categorie.save();
         res.json({
             data: categorie,
@@ -157,8 +158,34 @@ const update = async (req, res) => {
     }
 }
 
-const destroy = (req, res) => {
+const destroy = async (req, res) => {
+    const identifier = req.params.identifier;
 
+    let categorie;
+    if(mongoose.Types.ObjectId.isValid(identifier)){
+        categorie = await Categorie.findById(identifier);
+    }else{
+        categorie = await Categorie.findOne({ categorieName: identifier});
+    }
+
+    try {
+        if(!categorie)
+        {
+            return res.status(404).json({
+                status: 404,
+                message: "Category not found"
+            });
+        }
+
+        await categorie.softDelete(req.user._id);
+        res.json({
+            status: 200,
+            message: "category deleted successfully",
+        });
+
+    } catch (error) {
+        res.status(500).json(internalError("", error));
+    }
 }
 
-module.exports = { index, store,getOne,search, update, storingValidation }
+module.exports = { index, store,getOne,search, update, destroy, storingValidation }

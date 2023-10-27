@@ -5,8 +5,9 @@ const { authenticateToken } = require('../../middleware/authMiddleware');
 const { categorieMiddleware } = require('../../middleware/backoffice/categorie.middleware');
 
 router.get('/', authenticateToken, categorieMiddleware('categorie-read'), categorieController.index);
-router.post('/store', authenticateToken, categorieMiddleware('categorie-read'), categorieController.storingValidation , categorieController.store);
+router.post('/store', authenticateToken, categorieMiddleware('categorie-add'), categorieController.storingValidation , categorieController.store);
 router.get('/getone/:categoriename',authenticateToken, categorieMiddleware('categorie-read'), categorieController.getOne);
 router.get('/search/:search',authenticateToken, categorieMiddleware('categorie-read'), categorieController.search);
 router.put('/update/:id',authenticateToken, categorieMiddleware('categorie-edit'),categorieController.storingValidation, categorieController.update);
+router.delete('/delete/:identifier',authenticateToken, categorieMiddleware('categorie-edit'), categorieController.destroy)
 module.exports=router;

@@ -42,9 +42,10 @@ const categorieSchema = new mongoose.Schema(
     }
 );
 
-categorieSchema.methods.softDelete = async function(){
+categorieSchema.methods.softDelete = async function(userid){
     try {
         this.deletedAt = new Date();
+        this.deletedBy = userid;
         await  this.save();
     } catch (error) {
         console.error('Error while removing the role:', error);

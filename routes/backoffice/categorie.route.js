@@ -1,10 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const categorieRoute = require('../../controllers/backoffice/categorie.controller');
+const categorieController = require('../../controllers/backoffice/categorie.controller');
 const { authenticateToken } = require('../../middleware/authMiddleware');
 const passport = require('passport');
-const { categorieRead } = require('../../middleware/backoffice/categorie.middleware');
+const { categorieMiddleware } = require('../../middleware/backoffice/categorie.middleware');
 
-router.get('/', authenticateToken, categorieRead, categorieRoute.index);
+router.get('/', authenticateToken, categorieMiddleware('categorie-read'), categorieController.index);
+router.post('/store', authenticateToken, categorieMiddleware('categorie-read'), categorieController.storingValidation , categorieController.store);
 
 module.exports=router;

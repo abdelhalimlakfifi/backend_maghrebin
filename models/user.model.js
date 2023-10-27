@@ -45,25 +45,6 @@ const userSchema = new mongoose.Schema({
 });
 
 
-userSchema.methods.hasPermission = async (per) => {
-
-    await this.populate('role', 'permissions').execPopulate();
-
-    // Check if the user's role has the specified permission
-    const role = this.role;
-    if (!role) {
-        return false; // If the user doesn't have a role, they have no permissions
-    }
-
-    // Loop through the role's permissions and check if any match the given permissionName
-    for (const permission of role.permissions) {
-        if (permission.name === per) {
-            return true; // User has the specified permission
-        }
-    }
-
-    return false;
-}
 
 
 const User = mongoose.model('User', userSchema, "users");

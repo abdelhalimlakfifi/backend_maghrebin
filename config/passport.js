@@ -17,8 +17,19 @@ passport.use(
         try {
             
             // Attempt to find a user in the database by their ID extracted from the JWT payload
-            const user = await User.findById(jwtPayload.id);
+            const user = await User.findById(jwtPayload.id)
+                                    .populate({
+                                        path: 'role',
+                                        populate: {
+                                            path: 'permissions',
+                                            model:'Permission',
+                                            select: 'label'
+                                        }
+                                    })
+                                    .exec();
 
+            
+            
             if (!user) {
                 // If no user is found, authentication fails with no errors
                 return done(null, false);

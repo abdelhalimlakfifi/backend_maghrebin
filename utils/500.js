@@ -10,6 +10,7 @@ function internalError(errorMessage = "Internal Server Error", error){
         }
 
     }
+    console.log("Error from 500.js")
     throw error
 }
 

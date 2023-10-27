@@ -18,7 +18,7 @@ const authenticateToken = (req, res, next) => {
             }
             return res.status(401).json({ error: 'Unauthorized' });
         }
-        req.user = user; 
+        req.user = user;
         next(); 
     })(req, res, next);
 };

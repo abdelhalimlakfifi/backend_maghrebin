@@ -117,7 +117,6 @@ const search = async (req, res) => {
         const role = await Role.find({
             $or: [
                 { role: { $regex: query, $options: 'i' } },
-                
             ],
             deletedAt: null,
         }).populate('permissions').exec();

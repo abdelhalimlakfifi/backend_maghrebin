@@ -40,3 +40,7 @@ const subCategorie = new mongoose.Schema(
         timestamps: true
     }
 )
+
+
+const SubCategorie = mongoose.model('SubCategorie', subCategorie, 'sub_cetegories')
+module.exports = SubCategorie;

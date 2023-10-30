@@ -51,9 +51,12 @@ const loginUser = async (req, res) => {
             }
         );
 
+            
         return res.json({
+            status: "SUCCESS",
             token,
-            role: user.role
+            role: user.role,
+            user: user
         });
     } catch (error) {
         return res.status(500).json({

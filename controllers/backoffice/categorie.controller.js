@@ -4,7 +4,7 @@ const { body, validationResult} = require('express-validator')
 const mongoose = require('mongoose');
 
 const storingValidation = [
-    body('categorieName').notEmpty()
+    body('name').notEmpty()
 ]
 
 // Get All 

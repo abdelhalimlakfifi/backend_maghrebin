@@ -13,8 +13,9 @@ const storingValidation = [
     body('types')
         .notEmpty(),
     body('categoryId')
-        .notEmpty()
         .custom(async (value) => {
+
+            console.log(value)
             const categorie = await Categorie.findById(value);
 
             if(!categorie){
@@ -26,11 +27,12 @@ const storingValidation = [
         })
 ];
 
-
+// index
 const getAll = async(req, res) => {
 
 }
 
+// 
 const store = async(req, res) => {
 
     const body = req.body;
@@ -80,10 +82,52 @@ const store = async(req, res) => {
 
 const getOne = async(req, res) => {
 
+
+
+
 }
 
 const update = async(req, res) => {
 
+    const body = req.body;
+    if(!mongoose.Types.ObjectId.isValid(req.body.subCategorieId)){
+        return res.status(401).json({ error: "Unknown Sub categorie" });
+    }
+    const sub = await SubCategorie.findById(req.body.subCategorieId);
+
+
+    if(!sub){
+        return res.status(404).json({
+            error: "Unknown Sub Categorie"
+        });
+    }
+
+    if(body.name.length !== 0){
+        sub.name = body.name
+    }
+
+    const typeDocuments = await Type.find({ _id: { $in: body.types } });
+    if (typeDocuments.length !== body.types.length) {
+        return res.status(404).json({ error: "Some Type IDs do not exist" });
+    }
+    sub.type = body.types;
+
+    if(!(body.categoryId.oldCategorie && body.categoryId.newCategorie)){
+        return res.status(401).json({ error: "Categorie should not be empty" });
+    }
+
+    if(body.categoryId.oldCategorie !== body.categoryId.newCategorie){
+
+        // delete subcategorie from old categorie
+        const oldCategorie = await Categorie.findById(body.categoryId.oldCategorie);
+        oldCategorie.subcategorie = oldCategorie.subcategorie.filter(subcat => subcat !== sub._id)
+
+        res.json(oldCategorie);
+
+
+    }
+
+    // res.json(req.body)
 }
 const destroy = async(req, res) => {
 

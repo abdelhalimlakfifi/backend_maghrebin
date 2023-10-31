@@ -34,7 +34,7 @@ const getAll = async(req, res) => {
 const store = async(req, res) => {
 
     const body = req.body;
-    console.log(body)
+    
 
     try {
         const errors = validationResult(req);
@@ -48,17 +48,30 @@ const store = async(req, res) => {
             return res.status(404).json({ error: "Category not found" });
         }
         
-        const types = body.types.map(typeid => typeid)
-        
-        console.log(types);
+        if (!body.types || body.types.length === 0) {
+            return res.status(400).json({ error: "Types array is empty" });
+        }
+
+        // const typeIds = body.types.map(typeId => mongoose.Types.ObjectId(typeId));
+        const typeDocuments = await Type.find({ _id: { $in: body.types } });
+
+        if (typeDocuments.length !== body.types.length) {
+            return res.status(404).json({ error: "Some Type IDs do not exist" });
+        }
+
+
         const newSub = new SubCategorie({
             name: body.name,
-            type: types
-
-
+            type: body.types,
         });
 
-        res.json(newSub)
+        await newSub.save();
+        categorie.subcategorie.push(newSub._id);
+        await categorie.save();
+
+        res.json(newSub);
+
+
     } catch (error) {
         res.json(internalError("", error));
     }

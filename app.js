@@ -33,29 +33,8 @@ app.use("/api/",  authRoutes, adminRoutes);
 app.use('/api/role', roleRoute);
 app.use('/api/categorie', categorieRoute);
 app.use('/api/type', typeRoute);
-app.use('/api/subCategorieRoute', subCategorieRoute);
+app.use('/api/subcategorie', subCategorieRoute);
 
 app.listen(port, () => {
   console.log(`Server is running`);
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -3,22 +3,20 @@ const mongoose = require('mongoose');
 
 const categorieSchema = new mongoose.Schema(
     {
-        categorieName: {
+        name: {
             type: String,
             require: true,
             unique: true
+        },
+        typeId:{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Type'
         },
         active:{
             type: Boolean,
             require:true,
             default: true
         },
-        subcategorie: [
-            {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'SubCategorie'
-            }
-        ],
         createdBy: {
             type: mongoose.Schema.Types.ObjectId,
             ref:'User'

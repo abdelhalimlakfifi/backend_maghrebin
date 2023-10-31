@@ -8,5 +8,5 @@ const {permissionMiddleware} = require('../../middleware/backoffice/permissions.
 
 
 router.post('/store', authenticateToken, permissionMiddleware('sub-categorie-add'),subCategorieController.storingValidation, subCategorieController.store)
-
+router.put('/update', authenticateToken, permissionMiddleware('sub-categorie-add'), subCategorieController.update)
 module.exports = router

@@ -8,10 +8,10 @@ const categorieSchema = new mongoose.Schema(
             require: true,
             unique: true
         },
-        typeId:{
+        typeId:[{
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Type'
-        },
+        }],
         active:{
             type: Boolean,
             require:true,

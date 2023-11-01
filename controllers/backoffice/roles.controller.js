@@ -1,5 +1,5 @@
 const {internalError} = require('../../utils/500');
-const Role = require('../../models/roleModel')
+const Role = require('../../models/role.model')
 const Permission = require('../../models/permission.model');
 const { body, validationResult} = require('express-validator')
 require('dotenv').config();

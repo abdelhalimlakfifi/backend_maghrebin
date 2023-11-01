@@ -4,7 +4,8 @@ const { body, validationResult} = require('express-validator')
 const mongoose = require('mongoose');
 
 const storingValidation = [
-    body('name').notEmpty()
+    body('name').notEmpty(),
+    body('typeIds').notEmpty()
 ]
 
 // Get All 
@@ -27,7 +28,7 @@ const store = async (req, res) => {
         {
             return res.status(400).json({ errors: errors.array() });
         }
-        const existingDeletedCategorie = await Categorie.findOne({ categorieName: req.body.categorieName})
+        const existingDeletedCategorie = await Categorie.findOne({ name: req.body.name})
 
 
         if(existingDeletedCategorie){
@@ -39,10 +40,12 @@ const store = async (req, res) => {
             }
         }
 
+
+
         let newCategorie = new Categorie({
-            categorieName: req.body.categorieName,
-            subcategorie: [],
-            createdBy: req.user._id,
+            name: req.body.name,
+            typeId: req.body.typeIds,
+            createdBy: req.user._id
         })
 
         await newCategorie.save();
@@ -58,7 +61,7 @@ const store = async (req, res) => {
 // Get One categorie by Name
 const getOne = async (req, res) => {
     try {
-        const categorie = await Categorie.findOne({ $and: [{categorieName: req.params.categoriename}, {deletedAt:null}] })
+        const categorie = await Categorie.findOne({ $and: [{name: req.params.name}, {deletedAt:null}] }).populate('typeId').exec()
         if(!categorie){
             res.status(404);
             res.json({
@@ -83,10 +86,10 @@ const search = async (req, res) => {
     try {
         const categorie = await Categorie.find({
             $or:[
-                { categorieName: { $regex: query, $options:'i' }}
+                { name: { $regex: query, $options:'i' }}
             ],
             deletedAt: null
-        });
+        }).populate('typeId').exec();
 
         if(categorie.length === 0){
             res.status(404);
@@ -113,6 +116,12 @@ const update = async (req, res) => {
             return res.status(400).json({ errors: errors.array() });
         }
 
+        if(!mongoose.Types.ObjectId.isValid(id)){
+            res.status(401).json({
+                error: "Id not valid"
+            });
+            return
+        }
         const categorie = await Categorie.findById(id);
 
         if(!categorie)
@@ -125,11 +134,11 @@ const update = async (req, res) => {
             return
         }
 
-        if(categorie.categorieName !== req.body.categorieName)
+        if(categorie.name !== req.body.name)
         {
             const sameName = await Categorie.findOne({
                 $and:[{
-                    categorieName: req.body.categorieName
+                    name: req.body.name
                 },{
                     _id: { $ne: id}
                 }]
@@ -145,7 +154,8 @@ const update = async (req, res) => {
             }
 
         }
-        categorie.categorieName = req.body.categorieName;
+        categorie.name = req.body.name;
+        categorie.typeId = req.body.typeIds,
         categorie.updatedBy = req.user._id
         await categorie.save();
         res.json({
@@ -154,7 +164,8 @@ const update = async (req, res) => {
         });
 
     } catch (error) {
-        res.json(internalError("", error));
+        res.send(error)
+        // res.json(internalError());
     }
 }
 
@@ -165,7 +176,7 @@ const destroy = async (req, res) => {
     if(mongoose.Types.ObjectId.isValid(identifier)){
         categorie = await Categorie.findById(identifier);
     }else{
-        categorie = await Categorie.findOne({ categorieName: identifier});
+        categorie = await Categorie.findOne({ name: identifier});
     }
 
     try {

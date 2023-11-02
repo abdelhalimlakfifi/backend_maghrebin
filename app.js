@@ -12,6 +12,7 @@ const authRoutes = require("./routes/backoffice/authRoutes");
 const adminRoutes = require("./routes/backoffice/adminRoutes");
 const roleRoute = require('./routes/backoffice/roles.route')
 const categorieRoute = require('./routes/backoffice/categorie.route');
+const subcategorie = require('./routes/backoffice/subcategorie.route')
 const typeRoute = require('./routes/backoffice/type.route')
 connectDB();
 
@@ -32,6 +33,7 @@ app.use("/api/",  authRoutes, adminRoutes);
 app.use('/api/role', roleRoute);
 app.use('/api/categorie', categorieRoute);
 app.use('/api/type', typeRoute);
+app.use('/api/subcategorie', subcategorie);
 
 app.listen(port, () => {
   console.log(`Server is running`);

@@ -1,202 +1,193 @@
-const Categorie = require('../../models/categorie.model');
-const { internalError } = require('../../utils/500');
-const { body, validationResult} = require('express-validator')
-const mongoose = require('mongoose');
+// Import necessary libraries and modules.
+const Categorie = require('../../models/categorie.model'); // Import the Categorie model.
+const { internalError } = require('../../utils/500'); // Import a custom internalError function.
+const { body, validationResult } = require('express-validator'); // Import express-validator for input validation.
+const mongoose = require('mongoose'); // Import mongoose for working with MongoDB.
 
+// Define validation rules for storing a new category.
 const storingValidation = [
     body('name').notEmpty(),
     body('typeIds').notEmpty()
 ]
 
-// Get All 
+// Define a function to get all categories.
 const index = async (req, res) => {
     try {
-        const categories = await Categorie.find({ deletedAt: null});
-
+        // Find all categories that are not deleted and respond with the result.
+        const categories = await Categorie.find({ deletedAt: null });
         res.json(categories);
     } catch (error) {
         res.json(internalError());
     }
-
 }
 
-// Store a new Categorie
+// Define a function to store a new category.
 const store = async (req, res) => {
     try {
         const errors = validationResult(req);
-        if(!errors.isEmpty())
-        {
+        if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });
         }
-        const existingDeletedCategorie = await Categorie.findOne({ name: req.body.name})
 
-
-        if(existingDeletedCategorie){
-            if(existingDeletedCategorie.deletedAt === null){
-                res.status(409).json({ error: 'Categorie already exists' });
-                return
-            }else{
+        // Check if a deleted category with the same name exists and handle it.
+        const existingDeletedCategorie = await Categorie.findOne({ name: req.body.name })
+        if (existingDeletedCategorie) {
+            if (existingDeletedCategorie.deletedAt === null) {
+                res.status(409).json({ error: 'Category already exists' });
+                return;
+            } else {
                 await existingDeletedCategorie.deleteOne();
             }
         }
 
-
-
+        // Create a new category and save it to the database.
         let newCategorie = new Categorie({
             name: req.body.name,
             typeId: req.body.typeIds,
             createdBy: req.user._id
-        })
-
+        });
         await newCategorie.save();
 
         res.json(newCategorie);
     } catch (error) {
         res.json(internalError("", error));
     }
-
 }
 
-
-// Get One categorie by Name
+// Define a function to get one category by name.
 const getOne = async (req, res) => {
     try {
-        const categorie = await Categorie.findOne({ $and: [{name: req.params.name}, {deletedAt:null}] }).populate('typeId').exec()
-        if(!categorie){
+        const categorie = await Categorie.findOne({ $and: [{ name: req.params.name }, { deletedAt: null }] }).populate('typeId').exec();
+        if (!categorie) {
             res.status(404);
             res.json({
-                message: "Categorie Not found",
+                message: "Category not found",
                 status: 404
-            })
-
-            return
+            });
+            return;
         }
-
-        return res.json(categorie)
+        return res.json(categorie);
     } catch (error) {
         res.json(internalError("", error));
     }
 }
 
-
-// Search for categories
+// Define a function to search for categories.
 const search = async (req, res) => {
     const query = req.params.search;
-
     try {
-        const categorie = await Categorie.find({
-            $or:[
-                { name: { $regex: query, $options:'i' }}
+        // Search for categories based on the query and respond with the result.
+        const categories = await Categorie.find({
+            $or: [
+                { name: { $regex: query, $options: 'i' } }
             ],
             deletedAt: null
         }).populate('typeId').exec();
 
-        if(categorie.length === 0){
+        if (categories.length === 0) {
             res.status(404);
             res.json({
                 status: 404,
-                message: "No categorie founded"
+                message: "No category found"
             });
-            return
+            return;
         }
 
-        res.json(categorie);
+        res.json(categories);
     } catch (error) {
         res.json(internalError("", error));
     }
 }
 
-
-// update
+// Define a function to update a category.
 const update = async (req, res) => {
-    const id = req.params.id
+    const id = req.params.id;
     try {
         const errors = validationResult(req);
-        if(!errors.isEmpty()){
+        if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });
         }
 
-        if(!mongoose.Types.ObjectId.isValid(id)){
+        if (!mongoose.Types.ObjectId.isValid(id)) {
             res.status(401).json({
                 error: "Id not valid"
             });
-            return
+            return;
         }
-        const categorie = await Categorie.findById(id);
+        const category = await Categorie.findById(id);
 
-        if(!categorie)
-        {
+        if (!category) {
             res.status(404);
             res.json({
                 status: 404,
-                message:"Categorie not found"
+                message: "Category not found"
             });
-            return
+            return;
         }
 
-        if(categorie.name !== req.body.name)
-        {
+        if (category.name !== req.body.name) {
             const sameName = await Categorie.findOne({
-                $and:[{
+                $and: [{
                     name: req.body.name
-                },{
-                    _id: { $ne: id}
+                }, {
+                    _id: { $ne: id }
                 }]
             });
 
-            if(sameName){
+            if (sameName) {
                 res.json({
                     status: 401,
-                    messgae: "This Categorie already Exist"
+                    messgae: "This category already exists"
                 });
-
-                return
+                return;
             }
-
         }
-        categorie.name = req.body.name;
-        categorie.typeId = req.body.typeIds,
-        categorie.active = req.body.active
-        categorie.updatedBy = req.user._id
-        await categorie.save();
+
+        // Update category properties and save the changes.
+        category.name = req.body.name;
+        category.typeId = req.body.typeIds;
+        category.active = req.body.active;
+        category.updatedBy = req.user._id;
+        await category.save();
+
         res.json({
-            data: categorie,
+            data: category,
             status: 200
         });
-
     } catch (error) {
         res.json(internalError());
     }
 }
 
+// Define a function to delete a category.
 const destroy = async (req, res) => {
     const identifier = req.params.identifier;
 
-    let categorie;
-    if(mongoose.Types.ObjectId.isValid(identifier)){
-        categorie = await Categorie.findById(identifier);
-    }else{
-        categorie = await Categorie.findOne({ name: identifier});
+    let category;
+    if (mongoose.Types.ObjectId.isValid(identifier)) {
+        category = await Categorie.findById(identifier);
+    } else {
+        category = await Categorie.findOne({ name: identifier });
     }
 
     try {
-        if(!categorie)
-        {
+        if (!category) {
             return res.status(404).json({
                 status: 404,
                 message: "Category not found"
             });
         }
 
-        await categorie.softDelete(req.user._id);
+        // Soft delete the category and respond with a success message.
+        await category.softDelete(req.user._id);
         res.json({
             status: 200,
-            message: "category deleted successfully",
+            message: "Category deleted successfully",
         });
-
     } catch (error) {
         res.status(500).json(internalError("", error));
     }
 }
 
-module.exports = { index, store,getOne,search, update, destroy, storingValidation }
+// Export the defined functions and validation rules for use in other parts of the application.
+module.exports = { index, store, getOne, search, update, destroy, storingValidation };

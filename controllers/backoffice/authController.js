@@ -62,7 +62,24 @@ const loginUser = async (req, res) => {
     }
 };
 
+const checkAuth = async (req, res) => {
 
+    if(req.isAuthenticated()){
+        return res.json({
+            authenticated: true,
+            user: req.user
+        })
+    }
+
+
+    return res.status(401).json({
+        authenticated: false,
+        user: null
+    })
+
+
+    
+}
 const validateLogin = [
     body("username").not().isEmpty().withMessage("Username cannot be empty"),
     body("password").not().isEmpty().withMessage("Password cannot be empty"),
@@ -70,5 +87,6 @@ const validateLogin = [
 
 module.exports = {
     loginUser,
+    checkAuth,
     validateLogin,
 };

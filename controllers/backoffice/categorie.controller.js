@@ -156,6 +156,7 @@ const update = async (req, res) => {
         }
         categorie.name = req.body.name;
         categorie.typeId = req.body.typeIds,
+        categorie.active = req.body.active
         categorie.updatedBy = req.user._id
         await categorie.save();
         res.json({
@@ -164,8 +165,7 @@ const update = async (req, res) => {
         });
 
     } catch (error) {
-        res.send(error)
-        // res.json(internalError());
+        res.json(internalError());
     }
 }
 

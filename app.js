@@ -13,7 +13,14 @@ const adminRoutes = require("./routes/backoffice/adminRoutes");
 const roleRoute = require('./routes/backoffice/roles.route')
 const categorieRoute = require('./routes/backoffice/categorie.route');
 const subcategorie = require('./routes/backoffice/subcategorie.route')
-const typeRoute = require('./routes/backoffice/type.route')
+const typeRoute = require('./routes/backoffice/type.route');
+const userOtpVerification = require('./routes/backoffice/userOtpVerification.route');
+
+
+const UserOtpVerefication = require('./models/userOtpVerefication.model');
+const cron = require('node-cron');
+
+
 connectDB();
 
 app.use(morgan('dev'));
@@ -26,6 +33,21 @@ app.use(bodyParser.json());
 const port = process.env.PORT 
 
 
+
+// Schedule a cron job to run every minute
+cron.schedule('0 * * * *', async () => {
+  const now = new Date();
+  const fiveMinutesAgo = new Date(now - 5 * 60 * 1000);
+
+  try {
+    // Find and delete documents older than 5 minutes
+    await UserOtpVerefication.deleteMany({ isValidate: true, expiredAt: { $lt: fiveMinutesAgo } });
+
+    console.log('Deleted documents older than 5 minutes.');
+  } catch (error) {
+    console.error('Error deleting documents:', error);
+  }
+});
 // Connect to MongoDB
 
 
@@ -34,6 +56,7 @@ app.use('/api/role', roleRoute);
 app.use('/api/categorie', categorieRoute);
 app.use('/api/type', typeRoute);
 app.use('/api/subcategorie', subcategorie);
+app.use('/api/forgotpassword', userOtpVerification);
 
 app.listen(port, () => {
   console.log(`Server is running`);

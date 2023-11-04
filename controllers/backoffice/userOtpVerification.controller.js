@@ -11,8 +11,15 @@ const bcrypt = require('bcrypt');
 
 
 
-function AddMinutesToDate(date, minutes) {
-    return new Date(date.getTime() + minutes*60000);
+function diffetenceBetweenDateInMinutes(date) {
+    
+    const now = new Date();
+
+
+    const timeDifference = Math.abs(now - date);
+
+    const minutesDifference = Math.floor(timeDifference / (1000 * 60));
+    return minutesDifference;
 }
 function DateFormat(date){
     var days = date.getDate();
@@ -73,14 +80,11 @@ const checkEmail = async (req, res) => {
         const otp = otplib.authenticator.generate(process.env.OTP_SECRET);
 
         const now = new Date();
-        const expiredAt = AddMinutesToDate(now, 5);
-        console.log(DateFormat(now));
-        console.log(DateFormat(expiredAt));
+        
         const otpVerification = new UserOtpVerefication({
             userId: user._id,
             otp: otp,
-            isvalidate: false,
-            expiredAt: expiredAt
+            isvalidate: false
         })
 
         await otpVerification.save();
@@ -193,7 +197,10 @@ const checkOtp = async (req, res) => {
         }
 
         // Find the OTP verification record for the user
-        const otpVerification = await UserOtpVerefication.findOne({ userId: user._id });
+        const otpVerification = await UserOtpVerefication
+            .findOne({ userId: user._id })
+            .sort({ createdAt: -1 }) // Sort in descending order (newest first)
+            .limit(1);
 
         if (!otpVerification) {
             return res.status(404).json({
@@ -202,22 +209,16 @@ const checkOtp = async (req, res) => {
         }
 
         // Check if the OTP has expired
-        const now = new Date();
-        if (now > otpVerification.expiredAt) {
 
-            console.log(DateFormat(now))
-            console.log(DateFormat(otpVerification.expiredAt));
-            
-            console.log(now.getTime() > otpVerification.expiredAt.getTime());
+        console.log(otpVerification)
+
+        if (diffetenceBetweenDateInMinutes(otpVerification.createAt) > 5) {
             return res.status(400).json({
                 error: 'OTP has expired. Please request a new OTP.'
             });
         }
 
-        // Verify the OTP using otplib
-        const isValidOTP = otplib.authenticator.check(otpCode, process.env.OTP_SECRET);
-
-        if (!isValidOTP) {
+        if (otpVerification.otp != otpCode) {
             return res.status(400).json({
                 error: 'Invalid OTP. Please enter the correct OTP.'
             });

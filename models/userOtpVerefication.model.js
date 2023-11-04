@@ -16,13 +16,13 @@ const userOtpVerification = new mongoose.Schema({
         require: true,
         default: false
     },
-    expiredAt: {
-        type: Date,
-        require: true
-    },
     resetToken:{
         type: String,
         default:null
+    },
+    createAt:{
+        type: Date,
+        default: new Date()
     }
 });
 

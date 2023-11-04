@@ -35,13 +35,13 @@ const port = process.env.PORT
 
 
 // Schedule a cron job to run every minute
-cron.schedule('0 * * * *', async () => {
+cron.schedule('*/5 * * * *', async () => {
   const now = new Date();
   const fiveMinutesAgo = new Date(now - 5 * 60 * 1000);
 
   try {
     // Find and delete documents older than 5 minutes
-    await UserOtpVerefication.deleteMany({ isValidate: true, expiredAt: { $lt: fiveMinutesAgo } });
+    await UserOtpVerefication.deleteMany({ isValidate: true, createAt: { $lt: fiveMinutesAgo } });
 
     console.log('Deleted documents older than 5 minutes.');
   } catch (error) {

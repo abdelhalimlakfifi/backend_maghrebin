@@ -84,6 +84,7 @@ const checkEmail = async (req, res) => {
         const otpVerification = new UserOtpVerefication({
             userId: user._id,
             otp: otp,
+            createAt: now,
             isvalidate: false
         })
 
@@ -199,8 +200,9 @@ const checkOtp = async (req, res) => {
         // Find the OTP verification record for the user
         const otpVerification = await UserOtpVerefication
             .findOne({ userId: user._id })
-            .sort({ createdAt: -1 }) // Sort in descending order (newest first)
+            .sort({ createAt: -1 }) // Sort in descending order (newest first)
             .limit(1);
+
 
         if (!otpVerification) {
             return res.status(404).json({
@@ -259,8 +261,10 @@ const changePassword = async (req, res) => {
             });
         }
         // Get the token from the request headers
+        
         const token = req.headers.authorization.replace('Bearer ', '');
     
+        console.log(token);
         // Verify the token and extract the user ID
         const secretKey = process.env.JWT_SECRET;
     
@@ -275,8 +279,10 @@ const changePassword = async (req, res) => {
         }
         // Verify the token
         
-        const otpVerification = await UserOtpVerefication.findOne({ userId: decoded.userId });
-
+        const otpVerification = await UserOtpVerefication
+                                        .findOne({ userId: decoded.userId })
+                                        .sort({ createAt: -1 }) // Sort in descending order (newest first)
+                                        .limit(1);
         if(otpVerification.resetToken !== token){
             return res.status(401).json({
                 message: "Invalid Token"
@@ -306,6 +312,7 @@ const changePassword = async (req, res) => {
             });
         }
         
+        console.log(req.body.password, 10);
         const hashedPassword = await bcrypt.hash(req.body.password, 10);
         user.password = hashedPassword;
         
@@ -320,4 +327,4 @@ const changePassword = async (req, res) => {
         return res.json(internalError());
       }
 }
-module.exports = { checkEmail, checkOtp, changePassword, inputsValidates, checkOtpInput }
+module.exports = { checkEmail, checkOtp, changePassword, inputsValidates, checkOtpInput, changePasswordInputs }

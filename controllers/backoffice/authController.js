@@ -10,6 +10,7 @@ const loginUser = async (req, res) => {
     const { username, password } = req.body;   // Extract the username and password from the request body.
 
     // Validate the request body using express-validator.
+    
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {

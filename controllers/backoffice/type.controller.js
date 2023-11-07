@@ -45,7 +45,6 @@ const getOne = async (req, res) => {
         const identifier = req.params.identifier;
         const type = await Type.findById(identifier);
 
-        console.log(type)
         if(type && type.deletedAt === null)
         {
             return res.json(type);
@@ -84,7 +83,6 @@ const update = async (req, res) => {
         if(req.body.active)
         {
             res.send(req.body.active);
-            console.log(req.body.active);
         }
         
         type.name = req.body.name;

@@ -71,7 +71,6 @@ const checkEmail = async (req, res) => {
 
         const user = await User.findOne({ email: req.body.email});
 
-        console.log(user);
         if(!user){
             return res.status(404).json({
                 error: `User with (${req.body.email}) not found`
@@ -165,7 +164,6 @@ const checkEmail = async (req, res) => {
                     message:'Email sent successfully'
                 });
             } else {
-                console.log('Email sent: ' + info.response);
                 res.status(200).json({
                     message:'Email sent successfully'
                 });
@@ -193,7 +191,6 @@ const checkOtp = async (req, res) => {
         // Find the user by email
         const user = await User.findOne({ email });
 
-        console.log();
         if (!user) {
             return res.status(404).json({
                 error: `User with (${email}) not found`
@@ -258,8 +255,6 @@ const changePassword = async (req, res) => {
         // Get the token from the request headers
         
         const token = req.headers.authorization.replace('Bearer ', '');
-    
-        console.log(token);
         // Verify the token and extract the user ID
         const secretKey = process.env.JWT_SECRET;
     
@@ -307,7 +302,6 @@ const changePassword = async (req, res) => {
             });
         }
         
-        console.log(req.body.password, 10);
         const hashedPassword = await bcrypt.hash(req.body.password, 10);
         user.password = hashedPassword;
         

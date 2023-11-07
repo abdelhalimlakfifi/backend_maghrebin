@@ -71,6 +71,7 @@ const checkEmail = async (req, res) => {
 
         const user = await User.findOne({ email: req.body.email});
 
+        console.log(user);
         if(!user){
             return res.status(404).json({
                 error: `User with (${req.body.email}) not found`
@@ -172,6 +173,7 @@ const checkEmail = async (req, res) => {
         });
 
     } catch (error) {
+        throw error
         return res.json(internalError());
     }
 }
@@ -191,6 +193,7 @@ const checkOtp = async (req, res) => {
         // Find the user by email
         const user = await User.findOne({ email });
 
+        console.log();
         if (!user) {
             return res.status(404).json({
                 error: `User with (${email}) not found`
@@ -199,32 +202,24 @@ const checkOtp = async (req, res) => {
 
         // Find the OTP verification record for the user
         const otpVerification = await UserOtpVerefication
-            .findOne({ userId: user._id })
+            .findOne( { userId: user._id })
             .sort({ createAt: -1 }) // Sort in descending order (newest first)
             .limit(1);
 
 
-        if (!otpVerification) {
-            return res.status(404).json({
-                error: 'OTP verification record not found'
+        if((otpVerification && otpVerification.otp != otpCode) || !otpVerification){
+            return res.status(400).json({
+                error: 'Invalid OTP. Please enter the correct OTP.'
             });
         }
-
-        // Check if the OTP has expired
-
-        console.log(otpVerification)
-
+        
         if (diffetenceBetweenDateInMinutes(otpVerification.createAt) > 5) {
             return res.status(400).json({
                 error: 'OTP has expired. Please request a new OTP.'
             });
         }
 
-        if (otpVerification.otp != otpCode) {
-            return res.status(400).json({
-                error: 'Invalid OTP. Please enter the correct OTP.'
-            });
-        }
+        
 
         
         // OTP is valid, so generate a JWT token
@@ -280,9 +275,9 @@ const changePassword = async (req, res) => {
         // Verify the token
         
         const otpVerification = await UserOtpVerefication
-                                        .findOne({ userId: decoded.userId })
-                                        .sort({ createAt: -1 }) // Sort in descending order (newest first)
-                                        .limit(1);
+                                    .findOne({ userId: decoded.userId })
+                                    .sort({ createAt: -1 }) // Sort in descending order (newest first)
+                                    .limit(1);
         if(otpVerification.resetToken !== token){
             return res.status(401).json({
                 message: "Invalid Token"

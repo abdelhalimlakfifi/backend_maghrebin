@@ -13,6 +13,7 @@ const authenticateToken = (req, res, next) => {
         }
         
         if (!user) {
+            console.log(info);
             if (info && info.name === 'TokenExpiredError') {
                 return res.status(401).json({ error: 'Token has expired' });
             }

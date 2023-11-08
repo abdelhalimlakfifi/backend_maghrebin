@@ -54,18 +54,10 @@ const loginUser = async (req, res) => {
 };
 
 // Define a function checkAuth for checking if a user is authenticated.
-const checkAuth = async (req, res) => {
+const profile = async (req, res) => {
 
-    if (req.isAuthenticated()) {
-        return res.json({
-            authenticated: true,
-            user: req.user   // Return user information if authenticated.
-        });
-    }
-
-    return res.status(401).json({
-        authenticated: false,
-        user: null   // Return an error if not authenticated.
+    return res.json({
+        user: req.user   // Return user information if authenticated.
     });
 }
 
@@ -78,6 +70,6 @@ const validateLogin = [
 // Export the loginUser, checkAuth, and validateLogin functions for use in other parts of the application.
 module.exports = {
     loginUser,
-    checkAuth,
+    profile,
     validateLogin,
 };

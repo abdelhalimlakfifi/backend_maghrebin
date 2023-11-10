@@ -6,7 +6,6 @@ const {permissionMiddleware} = require('../../middleware/backoffice/permissions.
 
 const multer = require('multer')
 
-
 router.get('/', authenticateToken, permissionMiddleware('user-read'), userController.index);
 // router.post('/store', authenticateToken, permissionMiddleware('user-add'), userController.store);
 router.post('/store', userController.store);

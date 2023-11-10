@@ -15,7 +15,7 @@ const categorieRoute = require('./routes/backoffice/categorie.route');
 const subcategorie = require('./routes/backoffice/subcategorie.route')
 const typeRoute = require('./routes/backoffice/type.route');
 const userOtpVerification = require('./routes/backoffice/userOtpVerification.route');
-
+const userRoute = require('./routes/backoffice/user.route');
 
 const UserOtpVerefication = require('./models/userOtpVerefication.model');
 const cron = require('node-cron');
@@ -52,6 +52,7 @@ cron.schedule('*/5 * * * *', async () => {
 
 
 app.use("/api/",  authRoutes, adminRoutes);
+app.use("/api/users", userRoute);
 app.use('/api/role', roleRoute);
 app.use('/api/categorie', categorieRoute);
 app.use('/api/type', typeRoute);

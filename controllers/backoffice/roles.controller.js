@@ -38,7 +38,6 @@ const updatingValidation = [
 
 
 const getAll = async (req, res) => {
-
     try {
         const roles = await Role.find({ deletedAt: null }).populate('permissions').exec();
         res.json(roles);

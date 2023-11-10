@@ -21,7 +21,7 @@ const addDynamicUser = async () => {
             email: 'admin@mail.com',
             role: admin._id ,
             profile_picture: null,
-            categories_clicks: [],
+            
         });
 
         await newUser.save();

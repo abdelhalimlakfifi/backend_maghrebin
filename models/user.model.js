@@ -33,15 +33,26 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: null
     },
-    categories_clicks: [{
-        categorie_id: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Category'
-        },
-        count: {
-            type: Number
-        }
-    }],
+    createdBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref:'User',
+        default : null
+
+    },
+    updatedBy:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref:'User',
+        default : null
+    },
+    deletedAt:{
+        type : Date ,
+        default : null
+    },
+    deletedBy:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref:'User',
+        default : null
+    }
 },{
     timestamps: true
 });

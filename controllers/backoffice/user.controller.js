@@ -2,6 +2,20 @@ const User = require('../../models/user.model');
 const { internalError } = require('../../utils/500'); // Import a custom internalError function.
 const { body, validationResult } = require('express-validator'); // Import express-validator for input validation.
 const mongoose = require('mongoose'); // Import mongoose for working with MongoDB.
+const multer = require('multer');
+
+
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'uploads/');
+    },
+    filename: (req, file, cb) => {
+        cb(null, Date.now()+'-'+file.originalname);
+    }
+});
+
+const upload = multer({ storage });
 
 
 
@@ -18,7 +32,8 @@ const storingValidation = [
 const index = async (req, res) => {
     try {
 
-        const users = await User.find({ deletedAt: null }).populate({
+        const users = await User.find()
+        .populate({
             path: 'role',
             populate: {
                 path: 'permissions',
@@ -36,11 +51,19 @@ const index = async (req, res) => {
 
 const store = async (req, res) => {
     
+
+    const x = await upload.single('profile_picture');
     console.log(req.body);
+    console.log(x);
     res.json({
         test: "test"
     });
     return
+   
+   
+   
+   
+   
     try {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {

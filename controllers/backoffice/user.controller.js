@@ -350,16 +350,26 @@ const search = async (req, res) => {
 
 
 
+
+// Update all fields even the profile pic
+// Matnsaych l UpdatedBy
+// Kolshi illa password
+
 const update = async (req, res) => {
 
 }
 
 
+// SoftDelete
 
 const destroy = async (req, res) => {
 
 }
 
+// New function GHA DIAL PASSWORD
+const passwordChanger = async (req, res) => {
+    
+}
 
 
 const index = async (req, res) => {

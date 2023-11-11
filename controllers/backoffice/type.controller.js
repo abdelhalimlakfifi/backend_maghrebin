@@ -116,7 +116,7 @@ const destroy = async (req, res) => {
     }
 
 
-    await type.softDelete(identifier);
+    await type.softDelete(req.user._id);
         res.json({
             status: 200,
             message: "Type deleted successfully",

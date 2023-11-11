@@ -12,4 +12,6 @@ router.post('/store',authenticateToken, permissionMiddleware('user-add'), userCo
 
 router.get('/getOne/:username',authenticateToken, permissionMiddleware('user-read'), userController.getOne )
 
+router.get('/search',  userController.search); 
+
 module.exports = router

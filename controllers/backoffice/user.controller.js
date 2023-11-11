@@ -129,14 +129,14 @@ const getOne = async (req, res) => {
 
         console.log(req.params)
 
-         // Find user by username
+        // Find user by username
         const user = await User.findOne({username})
             .populate({
                 path: 'role',
                 populate: {
-                  path: 'permissions' 
+                    path: 'permissions'
                 }
-              });
+            });
 
         console.log(user)
 
@@ -158,12 +158,51 @@ const getOne = async (req, res) => {
         return res.status(500).json({error: 'Error finding user'});
     }
 
+    //Further improvement:
+    // Input validation on username
+    // Rate limiting to avoid DoS attacks
+    // Select projection to return only needed fields
+
 }
 
 
 
 const search = async (req, res) => {
-   
+    try {
+
+        // Get query parameters
+        const { query } = req.query;
+
+        console.log(query)
+    
+        // Search users
+        let users;
+        if(query) {
+          users = await User.find({
+            $or: [
+                //regex search with case-insensitive matching
+              { firstName: { $regex: query, $options: 'i' } },
+              { lastName: { $regex: query, $options: 'i' } },
+              { username: { $regex: query, $options: 'i' } },
+              { email: { $regex: query, $options: 'i' } }
+            ]  
+          })  
+        } else {
+          users = await User.find();
+        }
+
+        if(users.length === 0) {
+            return res.json({
+              message: "No users found for that search query" 
+            });
+        }
+    
+        // Return results
+        res.json({ users });
+    
+      } catch (err) {
+        res.status(500).json({ message: err });
+    }
 }
 
 

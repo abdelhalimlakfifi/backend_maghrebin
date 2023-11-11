@@ -122,43 +122,40 @@ const store = async (req, res) => {
 const getOne = async (req, res) => {
 
     try {
-        // Extract id from Query string
-
+        // Extract id from params 
         const {
-            id
-        } = req.query;
+            username
+        } = req.params;
 
-        console.log(req.query)
+        console.log(req.params)
 
-         // Validate id
-        if (!mongoose.Types.ObjectId.isValid(id)) {
-            return res.status(400).json({
-                error: 'Invalid user ID'
-            });
-        }
-
-         // Find user by ID
-        const user = await User.findById(id)
-            .populate('role', 'name permissions');
+         // Find user by username
+        const user = await User.findOne({username})
+            .populate({
+                path: 'role',
+                populate: {
+                  path: 'permissions' 
+                }
+              });
 
         console.log(user)
 
-        // // Check if user exists
-        // if (!user) {
-        //     return res.status(404).json({
-        //         error: 'User not found'
-        //     });
-        // }
+        // Check if user exists
+        if (!user) {
+            return res.status(404).json({
+                error: 'User not found'
+            });
+        }
 
-        // // Return user
-        // return res.status(200).json({
-        //     user
-        // });
+        // Return user
+        return res.status(200).json({
+            user
+        });
+
     } catch (error) {
         // Handle errors
-        return res.status(500).json({
-            error: 'Something went wrong'
-        });
+        console.error(error);
+        return res.status(500).json({error: 'Error finding user'});
     }
 
 }

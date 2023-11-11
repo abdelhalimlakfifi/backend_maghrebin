@@ -189,14 +189,14 @@ const getOne = async (req, res) => {
 
 const search= async (req, res) => {
     try {
-        const { username, email, lastName, role } = req.query;
+        const { firstName, username, email, lastName, role } = req.query;
 
         // Building the filter object based on the provided parameters
         const filter = {};
 
         // Use a case-insensitive regex to match any part of the query
         if (role && mongoose.Types.ObjectId.isValid(role)) {
-            filter.role = mongoose.Types.ObjectId(role);
+            filter.role = new mongoose.Types.ObjectId(role);
         }
 
 
@@ -209,6 +209,9 @@ const search= async (req, res) => {
         } 
         if (lastName){
             filter.last_name = { $regex: new RegExp(lastName, 'i') };
+        } 
+        if (firstName){
+            filter.first_name = { $regex: new RegExp(firstName, 'i') };
         } 
 
         console.log('Filter:', filter);

@@ -138,7 +138,7 @@ const store = async (req, res) => {
 const getOne = async (req, res) => {
 
     try {
-        // Extract id from params 
+        // Extract username from params 
         const {
             username
         } = req.params;
@@ -187,168 +187,43 @@ const getOne = async (req, res) => {
 
 
 
-// const search = async (req, res) => {
-//     try {
-
-//         // Get query parameters
-//         const {
-//             query,
-//             type
-//         } = req.query;
-
-//         console.log(query, type)
-
-//         // Search users
-//         let users;
-//         let queryCriteria;
-
-//         if (query) {
-
-//              // If searching by role, set role query
-//             if (type === 'role') {
-//                 queryCriteria = {
-//                     "role": {
-//                         $regex: query,
-//                         $options: 'i'
-//                     }
-//                 };
-//             // Otherwise set name/attribute search criteria 
-//             } else {
-//                 queryCriteria = {
-//                     $or: [{
-//                             firstName: {
-//                                 $regex: query,
-//                                 $options: 'i'
-//                             }
-//                         },
-//                         {
-//                             lastName: {
-//                                 $regex: query,
-//                                 $options: 'i'
-//                             }
-//                         },
-//                         {
-//                             username: {
-//                                 $regex: query,
-//                                 $options: 'i'
-//                             }
-//                         }
-//                     ]
-//                 };
-//             }
-
-//             users = await User.find(queryCriteria)
-//             // Populate the role reference
-//                 .populate({
-//                     path: 'role',
-//                     select: 'name'
-//                 })
-
-//         // If no search, return all users
-//         } else {
-//             users = await User.find()
-//                 .populate({
-//                     path: 'role',
-//                     select: 'name'
-//                 })
-//         }
-
-//         // if (users.length === 0) {
-//         //     return res.json({
-//         //         message: "No users found for that search query"
-//         //     });
-//         // }
-
-//         // Return results
-//         return res.json({
-//             users: users.map(user => ({
-//                 _id: user._id,
-//                 username: user.username,
-//                 firstName: user.firstName,
-//                 lastName: user.lastName,
-//                 roleName: user.role.name
-//             }))
-//         });
-
-//     } catch (err) {
-//         res.status(500).json({
-//             message: err
-//         });
-//     }
-// }
-
-
-
-const search = async (req, res) => {
+const search= async (req, res) => {
     try {
+        const { username, email, lastName, role } = req.query;
 
-        // Get query parameters
-        const {
-            query,
-            role
-        } = req.query;
+        // Building the filter object based on the provided parameters
+        const filter = {};
 
-        let searchedRole;
-
-        if(role){
-            searchedRole = await Role.findOne({ role: role })
+        // Use a case-insensitive regex to match any part of the query
+        if (role && mongoose.Types.ObjectId.isValid(role)) {
+            filter.role = mongoose.Types.ObjectId(role);
         }
 
-        // Search users
-        let users;
-        if (query) {
-            users = await User.find({
-                $or: [
-                    //regex search with case-insensitive matching
-                    {
-                        firstName: {
-                            $regex: query,
-                            $options: 'i'
-                        }
-                    },
-                    {
-                        lastName: {
-                            $regex: query,
-                            $options: 'i'
-                        }
-                    },
-                    {
-                        username: {
-                            $regex: query,
-                            $options: 'i'
-                        }
-                    },
-                    {
-                        email: {
-                            $regex: query,
-                            $options: 'i'
-                        }
-                    }
-                ]
-            })
-        } else {
-            users = await User.find();
+
+        // Adding other parameters to the filter
+        if (username) {
+            filter.username = { $regex: new RegExp(username, 'i') };
         }
+        if (email){
+            filter.email = { $regex: new RegExp(email, 'i') };
+        } 
+        if (lastName){
+            filter.last_name = { $regex: new RegExp(lastName, 'i') };
+        } 
 
-        if (users.length === 0) {
-            return res.json({
-                message: "No users found for that search query"
-            });
-        }
+        console.log('Filter:', filter);
 
-        // Return results
-        res.json({
-            users
-        });
 
-    } catch (err) {
-        res.status(500).json({
-            message: err
-        });
+        // Querying the database
+        const users = await User.find(filter);
+
+        console.log(users);
+        res.json({ success: true, users });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: 'Internal Server Error' });
     }
-}
-
-
+};
 
 
 // Update all fields even the profile pic

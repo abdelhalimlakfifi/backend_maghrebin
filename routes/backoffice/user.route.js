@@ -10,4 +10,6 @@ router.get('/', authenticateToken, permissionMiddleware('user-read'), userContro
 // router.post('/store', authenticateToken, permissionMiddleware('user-add'), userController.store);
 router.post('/store',authenticateToken, permissionMiddleware('user-add'), userController.store);
 
+router.get('/getOne',authenticateToken, permissionMiddleware('user-read'), userController.getOne )
+
 module.exports = router

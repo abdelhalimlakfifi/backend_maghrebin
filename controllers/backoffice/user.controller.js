@@ -187,87 +187,158 @@ const getOne = async (req, res) => {
 
 
 
+// const search = async (req, res) => {
+//     try {
+
+//         // Get query parameters
+//         const {
+//             query,
+//             type
+//         } = req.query;
+
+//         console.log(query, type)
+
+//         // Search users
+//         let users;
+//         let queryCriteria;
+
+//         if (query) {
+
+//              // If searching by role, set role query
+//             if (type === 'role') {
+//                 queryCriteria = {
+//                     "role": {
+//                         $regex: query,
+//                         $options: 'i'
+//                     }
+//                 };
+//             // Otherwise set name/attribute search criteria 
+//             } else {
+//                 queryCriteria = {
+//                     $or: [{
+//                             firstName: {
+//                                 $regex: query,
+//                                 $options: 'i'
+//                             }
+//                         },
+//                         {
+//                             lastName: {
+//                                 $regex: query,
+//                                 $options: 'i'
+//                             }
+//                         },
+//                         {
+//                             username: {
+//                                 $regex: query,
+//                                 $options: 'i'
+//                             }
+//                         }
+//                     ]
+//                 };
+//             }
+
+//             users = await User.find(queryCriteria)
+//             // Populate the role reference
+//                 .populate({
+//                     path: 'role',
+//                     select: 'name'
+//                 })
+
+//         // If no search, return all users
+//         } else {
+//             users = await User.find()
+//                 .populate({
+//                     path: 'role',
+//                     select: 'name'
+//                 })
+//         }
+
+//         // if (users.length === 0) {
+//         //     return res.json({
+//         //         message: "No users found for that search query"
+//         //     });
+//         // }
+
+//         // Return results
+//         return res.json({
+//             users: users.map(user => ({
+//                 _id: user._id,
+//                 username: user.username,
+//                 firstName: user.firstName,
+//                 lastName: user.lastName,
+//                 roleName: user.role.name
+//             }))
+//         });
+
+//     } catch (err) {
+//         res.status(500).json({
+//             message: err
+//         });
+//     }
+// }
+
+
+
 const search = async (req, res) => {
     try {
 
         // Get query parameters
         const {
             query,
-            type
+            role
         } = req.query;
 
-        console.log(query, type)
+        let searchedRole;
+
+        if(role){
+            searchedRole = await Role.findOne({ role: role })
+        }
 
         // Search users
         let users;
-        let queryCriteria;
-
         if (query) {
-
-             // If searching by role, set role query
-            if (type === 'role') {
-                queryCriteria = {
-                    "role": {
-                        $regex: query,
-                        $options: 'i'
-                    }
-                };
-            // Otherwise set name/attribute search criteria 
-            } else {
-                queryCriteria = {
-                    $or: [{
-                            firstName: {
-                                $regex: query,
-                                $options: 'i'
-                            }
-                        },
-                        {
-                            lastName: {
-                                $regex: query,
-                                $options: 'i'
-                            }
-                        },
-                        {
-                            username: {
-                                $regex: query,
-                                $options: 'i'
-                            }
+            users = await User.find({
+                $or: [
+                    //regex search with case-insensitive matching
+                    {
+                        firstName: {
+                            $regex: query,
+                            $options: 'i'
                         }
-                    ]
-                };
-            }
-
-            users = await User.find(queryCriteria)
-            // Populate the role reference
-                .populate({
-                    path: 'role',
-                    select: 'name'
-                })
-
-        // If no search, return all users
+                    },
+                    {
+                        lastName: {
+                            $regex: query,
+                            $options: 'i'
+                        }
+                    },
+                    {
+                        username: {
+                            $regex: query,
+                            $options: 'i'
+                        }
+                    },
+                    {
+                        email: {
+                            $regex: query,
+                            $options: 'i'
+                        }
+                    }
+                ]
+            })
         } else {
-            users = await User.find()
-                .populate({
-                    path: 'role',
-                    select: 'name'
-                })
+            users = await User.find();
         }
 
-        // if (users.length === 0) {
-        //     return res.json({
-        //         message: "No users found for that search query"
-        //     });
-        // }
+        if (users.length === 0) {
+            return res.json({
+                message: "No users found for that search query"
+            });
+        }
 
         // Return results
-        return res.json({
-            users: users.map(user => ({
-                _id: user._id,
-                username: user.username,
-                firstName: user.firstName,
-                lastName: user.lastName,
-                roleName: user.role.name
-            }))
+        res.json({
+            users
         });
 
     } catch (err) {
@@ -276,6 +347,7 @@ const search = async (req, res) => {
         });
     }
 }
+
 
 
 const update = async (req, res) => {

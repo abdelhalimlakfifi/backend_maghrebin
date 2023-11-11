@@ -1,11 +1,18 @@
-
 const User = require('../../models/user.model');
 const Role = require('../../models/role.model');
-const { internalError } = require('../../utils/500'); // Import a custom internalError function.
-const { check, body, validationResult } = require('express-validator'); // Import express-validator for input validation.
+const {
+    internalError
+} = require('../../utils/500'); // Import a custom internalError function.
+const {
+    check,
+    body,
+    validationResult
+} = require('express-validator'); // Import express-validator for input validation.
 const mongoose = require('mongoose'); // Import mongoose for working with MongoDB.
 const multer = require('multer');
-const {uploadFileFunction} = require('../../utils/uploadFile');
+const {
+    uploadFileFunction
+} = require('../../utils/uploadFile');
 const bcrypt = require('bcrypt');
 
 
@@ -35,7 +42,9 @@ const store = async (req, res) => {
             .withMessage('role is required')
             .run(req),
             check('password')
-            .isLength({ min: 6 })
+            .isLength({
+                min: 6
+            })
             .withMessage('Password must be at least 6 characters long')
             .run(req),
         ]);
@@ -43,32 +52,38 @@ const store = async (req, res) => {
 
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array() });
+            return res.status(400).json({
+                errors: errors.array()
+            });
         }
 
 
-        const emailFounded = await User.findOne({ email: req.body.email});
-        const usernameFounded = await User.findOne({ username: req.body.username});
-        const role = await Role.findOne({ role: req.body.role });
+        const emailFounded = await User.findOne({
+            email: req.body.email
+        });
+        const usernameFounded = await User.findOne({
+            username: req.body.username
+        });
+        const role = await Role.findOne({
+            role: req.body.role
+        });
         let alreadyError = [];
 
-        if(emailFounded)
-        {
+        if (emailFounded) {
             alreadyError.push({
                 attribute: "email",
                 error: "Email already exists"
             })
         }
 
-        if(usernameFounded)
-        {
+        if (usernameFounded) {
             alreadyError.push({
                 attribute: "username",
                 error: "username already exists"
             });
         }
 
-        if(!role){
+        if (!role) {
             alreadyError.push({
                 attribute: "role",
                 error: "Role not exist"
@@ -76,14 +91,15 @@ const store = async (req, res) => {
         }
 
 
-        if(alreadyError.length > 0){
-            return res.status(400).json({alreadyError})
+        if (alreadyError.length > 0) {
+            return res.status(400).json({
+                alreadyError
+            })
         }
 
 
         let imagePath = null
-        if(uploadedFile != undefined)
-        {
+        if (uploadedFile != undefined) {
             imagePath = uploadedFile.destination + uploadedFile.originalname
         }
 
@@ -130,7 +146,9 @@ const getOne = async (req, res) => {
         console.log(req.params)
 
         // Find user by username
-        const user = await User.findOne({username})
+        const user = await User.findOne({
+                username
+            })
             .populate({
                 path: 'role',
                 populate: {
@@ -155,7 +173,9 @@ const getOne = async (req, res) => {
     } catch (error) {
         // Handle errors
         console.error(error);
-        return res.status(500).json({error: 'Error finding user'});
+        return res.status(500).json({
+            error: 'Error finding user'
+        });
     }
 
     //Further improvement:
@@ -171,37 +191,89 @@ const search = async (req, res) => {
     try {
 
         // Get query parameters
-        const { query } = req.query;
+        const {
+            query,
+            type
+        } = req.query;
 
-        console.log(query)
-    
+        console.log(query, type)
+
         // Search users
         let users;
-        if(query) {
-          users = await User.find({
-            $or: [
-                //regex search with case-insensitive matching
-              { firstName: { $regex: query, $options: 'i' } },
-              { lastName: { $regex: query, $options: 'i' } },
-              { username: { $regex: query, $options: 'i' } },
-              { email: { $regex: query, $options: 'i' } }
-            ]  
-          })  
+        let queryCriteria;
+
+        if (query) {
+
+             // If searching by role, set role query
+            if (type === 'role') {
+                queryCriteria = {
+                    "role": {
+                        $regex: query,
+                        $options: 'i'
+                    }
+                };
+            // Otherwise set name/attribute search criteria 
+            } else {
+                queryCriteria = {
+                    $or: [{
+                            firstName: {
+                                $regex: query,
+                                $options: 'i'
+                            }
+                        },
+                        {
+                            lastName: {
+                                $regex: query,
+                                $options: 'i'
+                            }
+                        },
+                        {
+                            username: {
+                                $regex: query,
+                                $options: 'i'
+                            }
+                        }
+                    ]
+                };
+            }
+
+            users = await User.find(queryCriteria)
+            // Populate the role reference
+                .populate({
+                    path: 'role',
+                    select: 'name'
+                })
+
+        // If no search, return all users
         } else {
-          users = await User.find();
+            users = await User.find()
+                .populate({
+                    path: 'role',
+                    select: 'name'
+                })
         }
 
-        if(users.length === 0) {
-            return res.json({
-              message: "No users found for that search query" 
-            });
-        }
-    
+        // if (users.length === 0) {
+        //     return res.json({
+        //         message: "No users found for that search query"
+        //     });
+        // }
+
         // Return results
-        res.json({ users });
-    
-      } catch (err) {
-        res.status(500).json({ message: err });
+        return res.json({
+            users: users.map(user => ({
+                _id: user._id,
+                username: user.username,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                roleName: user.role.name
+            }))
+        });
+
+    } catch (err) {
+        res.status(500).json({
+            message: err
+        });
     }
 }
 

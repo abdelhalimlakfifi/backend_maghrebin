@@ -122,33 +122,38 @@ const store = async (req, res) => {
 const getOne = async (req, res) => {
 
     try {
-        // Extract id from request parameters
+        // Extract id from Query string
+
         const {
             id
-        } = req.params;
+        } = req.query;
 
-        // Validate id
+        console.log(req.query)
+
+         // Validate id
         if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).json({
                 error: 'Invalid user ID'
             });
         }
 
-        // Find user by ID
+         // Find user by ID
         const user = await User.findById(id)
             .populate('role', 'name permissions');
 
-        // Check if user exists
-        if (!user) {
-            return res.status(404).json({
-                error: 'User not found'
-            });
-        }
+        console.log(user)
 
-        // Return user
-        return res.status(200).json({
-            user
-        });
+        // // Check if user exists
+        // if (!user) {
+        //     return res.status(404).json({
+        //         error: 'User not found'
+        //     });
+        // }
+
+        // // Return user
+        // return res.status(200).json({
+        //     user
+        // });
     } catch (error) {
         // Handle errors
         return res.status(500).json({
@@ -161,10 +166,7 @@ const getOne = async (req, res) => {
 
 
 const search = async (req, res) => {
-    const {
-        id
-    } = req.params;
-
+   
 }
 
 

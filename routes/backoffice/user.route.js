@@ -12,8 +12,11 @@ router.post('/store',authenticateToken, permissionMiddleware('user-add'), userCo
 
 router.get('/getOne/:username',authenticateToken, permissionMiddleware('user-read'), userController.getOne )
 
-router.get('/search' , userController.search); 
+router.get('/search',authenticateToken, permissionMiddleware('user-read'), userController.search); 
 
-router.delete('/destroy/:username',authenticateToken, permissionMiddleware('user-read'), userController.destroy )
+router.delete('/destroy/:username',authenticateToken, permissionMiddleware('user-delete'), userController.destroy )
+
+router.patch('/change-password',authenticateToken, permissionMiddleware('user-edit'), userController.passwordChanger )
+
 
 module.exports = router

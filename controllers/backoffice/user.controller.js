@@ -293,6 +293,8 @@ const passwordChanger = async (req, res) => {
 
         // Update the user's password and record who changed it
         user.password = hashedNewPassword;
+        user.passwordLastUpdatedBy = req.user._id; // Save the user ID of the one who changed the password
+        user.passwordLastUpdated = new Date(); // Update the passwordLastUpdated field
         
 
         // Save the updated user in the database

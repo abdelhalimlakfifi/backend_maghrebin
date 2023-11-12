@@ -44,6 +44,14 @@ const userSchema = new mongoose.Schema({
         ref:'User',
         default : null
     },
+    passwordLastUpdated: {
+        type: Date,
+        default: null,
+    },
+    passwordLastUpdatedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+    },
     deletedAt:{
         type : Date ,
         default : null

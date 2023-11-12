@@ -14,6 +14,6 @@ router.get('/getOne/:username',authenticateToken, permissionMiddleware('user-rea
 
 router.get('/search' , userController.search); 
 
-router.delete('/destroy/:username', userController.destroy )
+router.delete('/destroy/:username',authenticateToken, permissionMiddleware('user-read'), userController.destroy )
 
 module.exports = router

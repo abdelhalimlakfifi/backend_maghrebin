@@ -229,11 +229,84 @@ const search= async (req, res) => {
 };
 
 
-// Update all fields even the profile pic
-// Matnsaych l UpdatedBy
-// Kolshi illa password
+
 
 const update = async (req, res) => {
+
+    try {
+        // const uploadedFile = await uploadFileFunction(req, res, 'profile_picture');
+        const { first_name, last_name, username, email } = req.body;
+
+        // Find the user by username
+        const user = await User.findOne({ username: username });
+
+        console.log(user)
+
+        // Check if the user exists
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        // Create an empty array to store update logs
+        user.updateLogs = [];
+
+        // Update user data and log changes
+        if (first_name !== undefined && user.first_name !== first_name) {
+            user.updateLogs.push({
+                field: 'first_name',
+                oldValue: user.first_name,
+                updatedBy: req.user._id
+            });
+            user.first_name = first_name;
+        }
+
+        if (last_name !== undefined && user.last_name !== last_name) {
+            user.updateLogs.push({
+                field: 'last_name',
+                oldValue: user.last_name,
+                updatedBy: req.user._id
+            });
+            user.last_name = last_name;
+        }
+
+        if (username !== undefined && user.username !== username) {
+            user.updateLogs.push({
+                field: 'username',
+                oldValue: user.username,
+                updatedBy: req.user._id
+            });
+            user.username = username;
+        }
+
+        if (email !== undefined && user.email !== email) {
+            user.updateLogs.push({
+                field: 'email',
+                oldValue: user.email,
+                updatedBy: req.user._id
+            });
+            user.email = email;
+        }
+
+        // // Update profile picture if a new one is uploaded
+        // if (uploadedFile !== undefined) {
+        //     user.updateLogs.push({
+        //         field: 'profile_picture',
+        //         oldValue: user.profile_picture,
+        //         newValue: uploadedFile.destination + uploadedFile.originalname,
+        //         updatedBy: req.user._id
+        //     });
+        //     user.profile_picture = uploadedFile.destination + uploadedFile.originalname;
+        // }
+
+        // Save the updated user in the database
+        await user.save();
+
+
+        res.json({ success: true, message: 'User updated successfully', user });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: 'Internal Server Error' });
+    }
 
 }
 
@@ -243,9 +316,6 @@ const update = async (req, res) => {
 const destroy = async (req, res) => {
 
     const username = req.params.username;
-
-    console.log(username)
-    console.log('Authenticated User:', req.user);
 
 
     let user = await User.findOne({ username: username });
@@ -274,7 +344,6 @@ const passwordChanger = async (req, res) => {
     try {
         const { username, newPassword, confirmNewPassword } = req.body;
 
-        console.log(req.body)
 
         if (newPassword !== confirmNewPassword) {
             return res.status(401).json({ success: false, message: ' passwords are unmatched' });

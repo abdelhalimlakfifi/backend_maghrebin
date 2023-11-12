@@ -268,14 +268,6 @@ const destroy = async (req, res) => {
 
 }
 
-// // Find the user by ID
-        // const user = await User.findById(req.user._id);
-        // // Check if the user exists
-        // if (!user) {
-        //     return res.status(404).json({ success: false, message: 'User not found' });
-        // }
-        // // Check if the current password provided matches the stored hashed password
-        // const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
 
 const passwordChanger = async (req, res) => {
     

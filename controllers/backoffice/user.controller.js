@@ -270,7 +270,45 @@ const destroy = async (req, res) => {
 
 const passwordChanger = async (req, res) => {
     
+    try {
+        const { currentPassword, newPassword } = req.body;
+
+        console.log(req.body)
+
+        // Find the user by ID
+        const user = await User.findById(req.user._id);
+
+        // Check if the user exists
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        // Check if the current password provided matches the stored hashed password
+        const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+        
+
+        if (!isPasswordValid) {
+            return res.status(401).json({ success: false, message: 'Current password is incorrect' });
+        }
+
+        // Hash the new password
+        const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+        // Update the user's password and record who changed it
+        user.password = hashedNewPassword;
+        user.updatedBy = req.user._id; // Save the user ID of the one who changed the password
+        user.passwordLastUpdated = new Date(); // Update the passwordLastUpdated field
+
+        // Save the updated user in the database
+        await user.save();
+
+        res.json({ success: true, message: 'Password updated successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: 'Internal Server Error' });
+    }
 }
+
 
 
 const index = async (req, res) => {
@@ -298,5 +336,6 @@ module.exports = {
     getOne,
     search,
     update,
+    passwordChanger,
     destroy
 };

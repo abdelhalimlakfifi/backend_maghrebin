@@ -234,21 +234,19 @@ const search= async (req, res) => {
 const update = async (req, res) => {
 
     try {
-        // const uploadedFile = await uploadFileFunction(req, res, 'profile_picture');
-        const { first_name, last_name, username, email } = req.body;
+        const uploadedFile = await uploadFileFunction(req, res, 'profile_picture');
+
+        const { first_name, last_name, username, email} = req.body;
+
+        const { identifier } = req.params
 
         // Find the user by username
-        const user = await User.findOne({ username: username });
-
-        console.log(user)
+        const user = await User.findOne({ username: identifier });
 
         // Check if the user exists
         if (!user) {
             return res.status(404).json({ success: false, message: 'User not found' });
         }
-
-        // Create an empty array to store update logs
-        user.updateLogs = [];
 
         // Update user data and log changes
         if (first_name !== undefined && user.first_name !== first_name) {
@@ -256,6 +254,7 @@ const update = async (req, res) => {
                 field: 'first_name',
                 oldValue: user.first_name,
                 updatedBy: req.user._id
+
             });
             user.first_name = first_name;
         }
@@ -270,6 +269,11 @@ const update = async (req, res) => {
         }
 
         if (username !== undefined && user.username !== username) {
+            // Check if the new username already exists for another user
+            const existingUser = await User.findOne({ username });
+            if (existingUser) {
+                return res.status(400).json({ success: false, message: 'Username already exists. Please choose another username.' });
+            }
             user.updateLogs.push({
                 field: 'username',
                 oldValue: user.username,
@@ -279,6 +283,11 @@ const update = async (req, res) => {
         }
 
         if (email !== undefined && user.email !== email) {
+            // Check if the new email already exists for another user
+            const existingUserEmail = await User.findOne({ email });
+            if (existingUserEmail) {
+                return res.status(400).json({ success: false, message: 'Email already exists. Please choose another email.' });
+            }
             user.updateLogs.push({
                 field: 'email',
                 oldValue: user.email,
@@ -287,18 +296,17 @@ const update = async (req, res) => {
             user.email = email;
         }
 
-        // // Update profile picture if a new one is uploaded
-        // if (uploadedFile !== undefined) {
-        //     user.updateLogs.push({
-        //         field: 'profile_picture',
-        //         oldValue: user.profile_picture,
-        //         newValue: uploadedFile.destination + uploadedFile.originalname,
-        //         updatedBy: req.user._id
-        //     });
-        //     user.profile_picture = uploadedFile.destination + uploadedFile.originalname;
-        // }
+        // Update profile picture if a new one is uploaded
+        if (uploadedFile !== undefined) {
+            user.updateLogs.push({
+                field: 'profile_picture',
+                oldValue: user.profile_picture,
+                updatedBy: req.user._id
+            });
+            user.profile_picture = uploadedFile.destination + uploadedFile.originalname;
+        }
 
-        // Save the updated user in the database
+        //Save the updated user in the database
         await user.save();
 
 
@@ -312,7 +320,6 @@ const update = async (req, res) => {
 
 
 // SoftDelete
-
 const destroy = async (req, res) => {
 
     const username = req.params.username;

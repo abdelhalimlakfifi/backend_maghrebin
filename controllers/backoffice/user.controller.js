@@ -242,9 +242,32 @@ const update = async (req, res) => {
 
 const destroy = async (req, res) => {
 
+    const username = req.params.username;
+
+    console.log(username)
+    console.log('Authenticated User:', req.user);
+
+
+    let user = await User.findOne({ username: username });
+
+    console.log('Found User:', user);
+
+    if(!user){
+        return res.status(404).json({
+            status: 404,
+            message: "user not found"
+        });
+    }
+
+
+    await user.softDelete(req.user._id);
+        res.json({
+            status: 200,
+            message: "User deleted successfully",
+        });
+
 }
 
-// New function GHA DIAL PASSWORD
 const passwordChanger = async (req, res) => {
     
 }

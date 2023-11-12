@@ -39,11 +39,18 @@ const userSchema = new mongoose.Schema({
         default : null
 
     },
-    updatedBy:{
-        type: mongoose.Schema.Types.ObjectId,
-        ref:'User',
-        default : null
-    },
+    updateLogs: [{
+        field: String,
+        oldValue: String,
+        updatedBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User'
+        },
+        updatedAt: {
+            type: Date,
+            default: Date.now
+        }
+    }],
     passwordLastUpdated: {
         type: Date,
         default: null,

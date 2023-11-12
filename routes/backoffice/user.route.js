@@ -7,7 +7,7 @@ const {permissionMiddleware} = require('../../middleware/backoffice/permissions.
 const multer = require('multer')
 
 router.get('/', authenticateToken, permissionMiddleware('user-read'), userController.index);
-// router.post('/store', authenticateToken, permissionMiddleware('user-add'), userController.store);
+
 router.post('/store',authenticateToken, permissionMiddleware('user-add'), userController.store);
 
 router.get('/getOne/:username',authenticateToken, permissionMiddleware('user-read'), userController.getOne )
@@ -16,7 +16,7 @@ router.get('/search',authenticateToken, permissionMiddleware('user-read'), userC
 
 router.delete('/destroy/:username',authenticateToken, permissionMiddleware('user-delete'), userController.destroy )
 
-router.put('/update/:username',authenticateToken, permissionMiddleware('user-edit'), userController.update )
+router.put('/update/:identifier',authenticateToken, permissionMiddleware('user-edit'), userController.update )
 
 router.patch('/change-password',authenticateToken, permissionMiddleware('user-edit'), userController.passwordChanger )
 

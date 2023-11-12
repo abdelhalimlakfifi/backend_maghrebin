@@ -57,6 +57,17 @@ const userSchema = new mongoose.Schema({
     timestamps: true
 });
 
+//Custom method added to a user document instance in a Mongoose schema. 
+userSchema.methods.softDelete = async function(userid){
+    try {
+        this.deletedAt = new Date();
+        this.deletedBy = userid;
+        await  this.save();
+    } catch (error) {
+        console.error ('Error while removing the user:', error);
+        throw error;
+    }
+}
 
 
 

@@ -16,6 +16,8 @@ router.get('/search',authenticateToken, permissionMiddleware('user-read'), userC
 
 router.delete('/destroy/:username',authenticateToken, permissionMiddleware('user-delete'), userController.destroy )
 
+router.put('/update/:username',authenticateToken, permissionMiddleware('user-edit'), userController.update )
+
 router.patch('/change-password',authenticateToken, permissionMiddleware('user-edit'), userController.passwordChanger )
 
 

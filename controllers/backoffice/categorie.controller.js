@@ -1,14 +1,15 @@
 // Import necessary libraries and modules.
 const Categorie = require('../../models/categorie.model'); // Import the Categorie model.
 const { internalError } = require('../../utils/500'); // Import a custom internalError function.
-const { body, validationResult } = require('express-validator'); // Import express-validator for input validation.
+const { body,check, validationResult } = require('express-validator'); // Import express-validator for input validation.
 const mongoose = require('mongoose'); // Import mongoose for working with MongoDB.
+const { uploadFileFunction } = require('../../utils/uploadFile');
 
 // Define validation rules for storing a new category.
-const storingValidation = [
-    body('name').notEmpty(),
-    body('typeIds').notEmpty()
-]
+// const storingValidation = [
+//     body('name').notEmpty(),
+//     body('typeIds').notEmpty()
+// ]
 
 // Define a function to get all categories.
 const index = async (req, res) => {
@@ -23,34 +24,120 @@ const index = async (req, res) => {
 
 // Define a function to store a new category.
 const store = async (req, res) => {
+    // try {
+    //     const uploadedImage = await uploadFileFunction(req, res, 'image', 'categorie_images')
+
+
+    //     if(uploadedImage == undefined)
+    //     {
+    //         return res.status(400).json({
+    //             status: 400,
+    //             error: "Image is required"
+    //         });
+    //     }
+    //     console.log(req.body);
+    //     console.log(uploadedImage);
+    //     return res.json(req.body);
+    //     // Check if a deleted category with the same name exists and handle it.
+    //     // const existingDeletedCategorie = await Categorie.findOne({ name: req.body.name })
+    //     // if (existingDeletedCategorie) {
+    //     //     if (existingDeletedCategorie.deletedAt === null) {
+    //     //         res.status(409).json({ error: 'Category already exists' });
+    //     //         return;
+    //     //     } else {
+    //     //         await existingDeletedCategorie.deleteOne();
+    //     //     }
+    //     // }
+
+    //     // Create a new category and save it to the database.
+    //     // let newCategorie = new Categorie({
+    //     //     name: req.body.name,
+    //     //     typeId: req.body.typeIds,
+    //     //     createdBy: req.user._id
+    //     // });
+    //     // await newCategorie.save();
+
+    //     // res.json(newCategorie);
+    // } catch (error) {
+    //     res.json(internalError("", error));
+    // }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     try {
+        const uploadedFile = await uploadFileFunction(req, res, 'category_image', 'categories_images');
+        await Promise.all([
+            check('name')
+                .notEmpty()
+                .withMessage('Category name is required')
+                .run(req),
+            check('typeIds')
+                .isArray({ min: 1 })
+                .withMessage('At least one type ID is required')
+                .run(req),
+        ]);
+
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array() });
+            return res.status(400).json({
+                errors: errors.array(),
+            });
         }
 
-        // Check if a deleted category with the same name exists and handle it.
-        const existingDeletedCategorie = await Categorie.findOne({ name: req.body.name })
-        if (existingDeletedCategorie) {
-            if (existingDeletedCategorie.deletedAt === null) {
-                res.status(409).json({ error: 'Category already exists' });
-                return;
-            } else {
-                await existingDeletedCategorie.deleteOne();
-            }
-        }
+        const { name, typeIds } = req.body;
 
-        // Create a new category and save it to the database.
-        let newCategorie = new Categorie({
-            name: req.body.name,
-            typeId: req.body.typeIds,
-            createdBy: req.user._id
+        let imagePath = null;
+        if (uploadedFile == undefined) 
+        {
+            return res.status(400).json({
+                status: 400,
+                error: "Image is required"
+            });
+        }
+        imagePath = uploadedFile.destination + '/' + uploadedFile.originalname;
+
+        const category = new Categorie({
+            name,
+            image: imagePath,
+            typeIds,
         });
-        await newCategorie.save();
 
-        res.json(newCategorie);
+        await category.save();
+
+        return res.status(200).json({
+            message: 'Category saved successfully',
+            category,
+        });
     } catch (error) {
-        res.json(internalError("", error));
+        console.error(error);
+        res.status(500).json({
+            error: 'Internal Server Error',
+        });
     }
 }
 
@@ -190,4 +277,4 @@ const destroy = async (req, res) => {
 }
 
 // Export the defined functions and validation rules for use in other parts of the application.
-module.exports = { index, store, getOne, search, update, destroy, storingValidation };
+module.exports = { index, store, getOne, search, update, destroy };

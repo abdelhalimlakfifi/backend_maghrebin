@@ -19,7 +19,7 @@ const bcrypt = require('bcrypt');
 
 const store = async (req, res) => {
     try {
-        const uploadedFile = await uploadFileFunction(req, res, 'profile_picture');
+        const uploadedFile = await uploadFileFunction(req, res, 'profile_picture', 'users_profile');
         await Promise.all([
             check('first_name')
             .notEmpty()

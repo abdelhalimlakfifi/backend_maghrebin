@@ -167,7 +167,6 @@ module.exports = {
     index,
     store,
     getOne,
-    search,
     update,
     destroy,
     storingValidation

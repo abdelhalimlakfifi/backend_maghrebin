@@ -19,12 +19,14 @@ const userRoute = require('./routes/backoffice/user.route');
 const colorRoute = require('./routes/backoffice/color.route');
 const UserOtpVerefication = require('./models/userOtpVerefication.model');
 const cron = require('node-cron');
+const path = require('path');
 
 
 connectDB();
 
 
 
+app.use('/api/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use(morgan('dev'));
 app.use(express.json());

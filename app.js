@@ -16,12 +16,15 @@ const subcategorie = require('./routes/backoffice/subcategorie.route')
 const typeRoute = require('./routes/backoffice/type.route');
 const userOtpVerification = require('./routes/backoffice/userOtpVerification.route');
 const userRoute = require('./routes/backoffice/user.route');
-
+const colorRoute = require('./routes/backoffice/color.route');
 const UserOtpVerefication = require('./models/userOtpVerefication.model');
 const cron = require('node-cron');
 
 
 connectDB();
+
+
+
 
 app.use(morgan('dev'));
 app.use(express.json());
@@ -52,6 +55,7 @@ cron.schedule('*/5 * * * *', async () => {
 
 
 app.use("/api/",  authRoutes, adminRoutes);
+app.use('/api/colors', colorRoute);
 app.use("/api/users", userRoute);
 app.use('/api/role', roleRoute);
 app.use('/api/categorie', categorieRoute);

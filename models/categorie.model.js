@@ -12,6 +12,10 @@ const categorieSchema = new mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Type'
         }],
+        image: {
+            type: String,
+            required: true
+        },
         active:{
             type: Boolean,
             require:true,

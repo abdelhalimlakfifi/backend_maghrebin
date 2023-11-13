@@ -22,7 +22,7 @@ const storingValidation = [
 // Define a function to get all colors.
 const index = async (req, res) => {
     try {
-        const colors = await Color.find();
+        const colors = await Color.find({ deletedAt: null });
         res.json(colors);
     } catch (error) {
         internalError(res, error.message);
@@ -48,12 +48,17 @@ const store = async (req, res) => {
         } = req.body;
         const createdBy = req.user._id; // Assuming you have authentication middleware setting req.user
 
-        const exestingColor = await Color.findOne({ name: name});
-        if(exestingColor){
-            return res.status(400).json({
-                status: 400,
-                error: "Color name already exist"
-            });
+        const existingColor = await Color.findOne({ name: name});
+        if(existingColor){
+            if(existingColor.deletedAt != null)
+            {
+                await Color.deleteOne({ _id: existingColor._id });
+            }else{
+                return res.status(400).json({
+                    status: 400,
+                    error: "Color name already exist"
+                });
+            }
         }
         const newColor = new Color({
             name,
@@ -74,7 +79,8 @@ const store = async (req, res) => {
 const getOne = async (req, res) => {
     try {
         const color = await Color.findOne({
-            name: req.params.name
+            name: req.query.name,
+            deletedAt: null
         });
         if (!color) {
             return res.status(404).json({
@@ -87,11 +93,7 @@ const getOne = async (req, res) => {
     }
 };
 
-// Define a function to search for colors.
-const search = async (req, res) => {
-    // You can implement a search functionality based on your requirements.
-    res.send('Search functionality not implemented');
-};
+
 
 // Define a function to update a color.
 const update = async (req, res) => {
@@ -135,10 +137,10 @@ const update = async (req, res) => {
 // Define a function to delete a color.
 const destroy = async (req, res) => {
     try {
-        const deletedBy = req.user.id;
+        const deletedBy = req.user._id;
 
         const color = await Color.findOneAndUpdate({
-            name: req.params.name
+            name: req.query.name
         }, {
             deletedAt: new Date(),
             deletedBy

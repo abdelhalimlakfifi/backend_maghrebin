@@ -9,11 +9,11 @@ const {permissionMiddleware} = require('../../middleware/backoffice/permissions.
 router.get('/', authenticateToken, colorController.index)
 // store
 router.post('/store', authenticateToken, colorController.storingValidation ,colorController.store);
-
-
 // update
 router.put('/update', authenticateToken, colorController.update);
-
-
+// destroy
+router.delete('/delete', authenticateToken, colorController.destroy);
+// 
+router.get('/get-one', authenticateToken, colorController.getOne)
 
 module.exports = router

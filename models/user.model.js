@@ -35,28 +35,54 @@ const userSchema = new mongoose.Schema({
     },
     createdBy: {
         type: mongoose.Schema.Types.ObjectId,
-        ref:'User',
-        default : null
+        ref: 'User',
+        default: null
 
     },
-    updatedBy:{
-        type: mongoose.Schema.Types.ObjectId,
-        ref:'User',
-        default : null
+    updateLogs: [{
+        field: String,
+        oldValue: String,
+        updatedBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User'
+        },
+        updatedAt: {
+            type: Date,
+            default: Date.now
+        }
+    }],
+    passwordLastUpdated: {
+        type: Date,
+        default: null,
     },
-    deletedAt:{
-        type : Date ,
-        default : null
-    },
-    deletedBy:{
+    passwordLastUpdatedBy: {
         type: mongoose.Schema.Types.ObjectId,
-        ref:'User',
-        default : null
+        ref: 'User',
+    },
+    deletedAt: {
+        type: Date,
+        default: null
+    },
+    deletedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        default: null
     }
-},{
+}, {
     timestamps: true
 });
 
+//Custom method added to a user document instance in a Mongoose schema. 
+userSchema.methods.softDelete = async function (userid) {
+    try {
+        this.deletedAt = new Date();
+        this.deletedBy = userid;
+        await this.save();
+    } catch (error) {
+        console.error('Error while removing the user:', error);
+        throw error;
+    }
+}
 
 
 

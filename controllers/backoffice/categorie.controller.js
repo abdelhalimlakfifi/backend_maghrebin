@@ -5,11 +5,6 @@ const { body,check, validationResult } = require('express-validator'); // Import
 const mongoose = require('mongoose'); // Import mongoose for working with MongoDB.
 const { uploadFileFunction } = require('../../utils/uploadFile');
 
-// Define validation rules for storing a new category.
-// const storingValidation = [
-//     body('name').notEmpty(),
-//     body('typeIds').notEmpty()
-// ]
 
 // Define a function to get all categories.
 const index = async (req, res) => {
@@ -24,71 +19,6 @@ const index = async (req, res) => {
 
 // Define a function to store a new category.
 const store = async (req, res) => {
-    // try {
-    //     const uploadedImage = await uploadFileFunction(req, res, 'image', 'categorie_images')
-
-
-    //     if(uploadedImage == undefined)
-    //     {
-    //         return res.status(400).json({
-    //             status: 400,
-    //             error: "Image is required"
-    //         });
-    //     }
-    //     console.log(req.body);
-    //     console.log(uploadedImage);
-    //     return res.json(req.body);
-    //     // Check if a deleted category with the same name exists and handle it.
-    //     // const existingDeletedCategorie = await Categorie.findOne({ name: req.body.name })
-    //     // if (existingDeletedCategorie) {
-    //     //     if (existingDeletedCategorie.deletedAt === null) {
-    //     //         res.status(409).json({ error: 'Category already exists' });
-    //     //         return;
-    //     //     } else {
-    //     //         await existingDeletedCategorie.deleteOne();
-    //     //     }
-    //     // }
-
-    //     // Create a new category and save it to the database.
-    //     // let newCategorie = new Categorie({
-    //     //     name: req.body.name,
-    //     //     typeId: req.body.typeIds,
-    //     //     createdBy: req.user._id
-    //     // });
-    //     // await newCategorie.save();
-
-    //     // res.json(newCategorie);
-    // } catch (error) {
-    //     res.json(internalError("", error));
-    // }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     try {
         const uploadedFile = await uploadFileFunction(req, res, 'category_image', 'categories_images');
         await Promise.all([
@@ -119,12 +49,26 @@ const store = async (req, res) => {
                 error: "Image is required"
             });
         }
-        imagePath = uploadedFile.destination + '/' + uploadedFile.originalname;
+        imagePath = uploadedFile.destination + '/' + uploadedFile.filename;
 
+        const existingDeletedCategorie = await Categorie.findOne({ name: req.body.name })
+        if (existingDeletedCategorie) 
+        {
+            if (existingDeletedCategorie.deletedAt === null) 
+            {
+                res.status(409).json({ error: 'Category already exists' });
+                return;
+            } 
+            else 
+            {
+                await existingDeletedCategorie.deleteOne();
+            }
+        }
+        
         const category = new Categorie({
             name,
             image: imagePath,
-            typeIds,
+            typeId:typeIds,
         });
 
         await category.save();
@@ -190,6 +134,19 @@ const search = async (req, res) => {
 const update = async (req, res) => {
     const id = req.params.id;
     try {
+
+        const uploadedFile = await uploadFileFunction(req, res, 'category_image', 'categories_images');
+        await Promise.all([
+            check('name')
+                .notEmpty()
+                .withMessage('Category name is required')
+                .run(req),
+            check('typeIds')
+                .isArray({ min: 1 })
+                .withMessage('At least one type ID is required')
+                .run(req),
+        ]);
+
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });
@@ -222,18 +179,35 @@ const update = async (req, res) => {
             });
 
             if (sameName) {
-                res.json({
-                    status: 401,
-                    messgae: "This category already exists"
-                });
-                return;
+
+                if(sameName.deletedAt != null)
+                {
+                    await sameName.deleteOne()
+
+                }else{
+                    res.json({
+                        status: 401,
+                        messgae: "This category already exists"
+                    });
+                    return;
+                }
             }
+        }
+
+
+        let imagePath = null;
+        if (uploadedFile == undefined) 
+        {
+            imagePath = category.image;
+        }else{
+            imagePath = uploadedFile.destination + '/' + uploadedFile.filename;
         }
 
         // Update category properties and save the changes.
         category.name = req.body.name;
         category.typeId = req.body.typeIds;
         category.active = req.body.active;
+        category.image = imagePath;
         category.updatedBy = req.user._id;
         await category.save();
 

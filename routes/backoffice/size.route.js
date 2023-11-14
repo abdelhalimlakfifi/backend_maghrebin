@@ -6,8 +6,11 @@ const {permissionMiddleware} = require('../../middleware/backoffice/permissions.
 
 
 
-router.post('/store', authenticateToken,permissionMiddleware('size-add'), sizeController.store);
-
+router.get('/', authenticateToken, permissionMiddleware('size-read'), sizeController.index);
+router.get('/:id', authenticateToken, permissionMiddleware('size-read'), sizeController.getOne);
+router.delete('/destroy/:id', authenticateToken, permissionMiddleware('size-read'), sizeController.destroy);
+router.post('/store', authenticateToken,permissionMiddleware('size-add'), sizeController.storingValidation, sizeController.store);
+router.put('/update/:id', authenticateToken,permissionMiddleware('size-edit'), sizeController.storingValidation, sizeController.update);
 
 
 

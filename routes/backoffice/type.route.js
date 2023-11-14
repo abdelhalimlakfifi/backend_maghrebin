@@ -7,9 +7,9 @@ const {permissionMiddleware} = require('../../middleware/backoffice/permissions.
 
 router.get('/', authenticateToken,permissionMiddleware('type-read'), typeController.index);
 router.get('/getone/:identifier', authenticateToken,permissionMiddleware('type-read'), typeController.getOne)
-router.post('/store', authenticateToken,permissionMiddleware('type-add'), typeController.storingVlidation, typeController.store);
-router.put('/update/:identifier', authenticateToken,permissionMiddleware('type-edit'), typeController.storingVlidation, typeController.update);
-router.delete('/delete/:identifier', authenticateToken,permissionMiddleware('type-delete'), typeController.storingVlidation, typeController.destroy);
+router.post('/store', authenticateToken,permissionMiddleware('type-add'), typeController.store);
+router.put('/update/:identifier', authenticateToken,permissionMiddleware('type-edit'), typeController.update);
+router.delete('/delete/:identifier', authenticateToken,permissionMiddleware('type-delete'), typeController.destroy);
 
 
 

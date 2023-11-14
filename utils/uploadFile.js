@@ -1,31 +1,31 @@
 const multer = require('multer');
 
 
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'uploads/users_profile/');
-    },
-    filename: (req, file, cb) => {
-        cb(null, Date.now() + '_' + file.originalname);
-    }
-});
+const uploadFileFunction = (req, res, fileAttribute, destination) => {
 
-const fileFilter = (req, file, cb) => {
-    const allowedMimeTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+    console.log("11");
+    const storage = multer.diskStorage({
+        destination: (req, file, cb) => {
+            cb(null, `uploads/${destination}`);
+        },
+        filename: (req, file, cb) => {
+            cb(null, Date.now() + '_' + file.originalname);
+        }
+    });
+    console.log("22");
+    const fileFilter = (req, file, cb) => {
+        const allowedMimeTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+    
+        if (allowedMimeTypes.includes(file.mimetype)) {
+            cb(null, true);
+        } else {
+            cb(new Error('Invalid file type. Only PNG, JPEG, JPG, and WebP images are allowed.'));
+        }
+    };
 
-    if (allowedMimeTypes.includes(file.mimetype)) {
-        cb(null, true);
-    } else {
-        cb(new Error('Invalid file type. Only PNG, JPEG, JPG, and WebP images are allowed.'));
-    }
-};
 
 
-
-
-
-
-const uploadFileFunction = (req, res, fileAttribute) => {
+    console.log("33");
     return new Promise((resolve, reject) => {
         // Configure upload
         const upload = multer({
@@ -42,6 +42,7 @@ const uploadFileFunction = (req, res, fileAttribute) => {
                 // An unknown error occurred when uploading
                 reject(err.message);
             } else {
+                console.log("44");
                 // Resolve the Promise with the uploaded file
                 resolve(req.file);
             }

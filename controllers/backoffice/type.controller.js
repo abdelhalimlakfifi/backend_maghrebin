@@ -112,6 +112,8 @@ const update = async (req, res) => {
         type.updatedBy = req.user._id;  // Set updatedBy to the user's ID
         type.image = imagePath == null ? type.image : imagePath;  // Set image to the new imagePath if provided
 
+
+        await type.save()
         res.json({
             data: type,
             status: 200

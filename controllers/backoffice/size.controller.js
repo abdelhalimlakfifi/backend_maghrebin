@@ -1,5 +1,6 @@
-const { validationResult } = require('express-validator');
+const { body, validationResult } = require('express-validator');
 const Size = require('../../models/size.model'); // Adjust the path based on your project structure
+const { default: mongoose } = require('mongoose');
 
 // Controller for handling CRUD operations on Size model
 const storingValidation = [
@@ -32,12 +33,32 @@ const store = async (req, res) => {
         });
     }
 
-    console.log(res.body);
-    res.send("hay")
     try {
-        // const newSize = new Size(req.body);
-        // await newSize.save();
-        // res.json(newSize);
+
+        const existingSize = await Size.findOne({ name: req.body.name });
+        if(existingSize){
+
+            if(existingSize.deletedAt !=null)
+            {
+                existingSize.deleteOne();
+            }else{
+                return res.status(400).json({
+                    status: 400,
+                    error: "size Already exist"
+                });
+            }
+        }
+        const newSize = new Size({
+            name    :   req.body.name,
+            abreveation :   req.body.abreveation,
+            description :   req.body.description,
+            bust    :   req.body.bust,
+            waist   :   req.body.waist,
+            hips    :   req.body.hips,
+            createdBy   :   req.user._id
+        });
+        await newSize.save();
+        res.json(newSize);
     } catch (error) {
         console.error(error);
         res.status(500).send('Internal Server Error');
@@ -84,8 +105,29 @@ const update = async (req, res) => {
             });
         }
 
+        const existingSize = await Size.findOne({ name: req.body.name});
+        if(existingSize){
+
+            if(existingSize.deletedAt !=null)
+            {
+                existingSize.deleteOne();
+            }else{
+                return res.status(400).json({
+                    status: 400,
+                    error: "size name Already exist"
+                });
+            }
+        }
+
         // Update the size fields
-        size.set(req.body);
+        size.name   =   req.body.name;
+        size.abreveation =   req.body.abreveation;
+        size.description =   req.body.description;
+        size.bust   =   req.body.bust;
+        size.waist  =   req.body.waist;
+        size.hips   =   req.body.hips;
+        size.updatedBy = req.user._id;
+
         await size.save();
 
         res.json(size);
@@ -98,6 +140,13 @@ const update = async (req, res) => {
 // Destroy - Soft delete a size by ID
 const destroy = async (req, res) => {
     try {
+
+        if(!mongoose.Types.ObjectId.isValid(req.params.id)){
+            return res.status(400).json({
+                status: 400,
+                error: "Id not valid"
+            })
+        }
         const size = await Size.findOne({
             _id: req.params.id,
             deletedAt: null

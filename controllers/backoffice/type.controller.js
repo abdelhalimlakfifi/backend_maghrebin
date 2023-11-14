@@ -1,11 +1,8 @@
 const Type = require('../../models/type.model');
 const { internalError } = require('../../utils/500');
-const { body, validationResult} = require('express-validator')
+const { body, check, validationResult} = require('express-validator')
+const { uploadFileFunction } = require('../../utils/uploadFile');
 const mongoose = require('mongoose');
-
-const storingVlidation = [
-    body('name').notEmpty()
-];
 
 
 const index = async (req, res) => {
@@ -20,24 +17,41 @@ const index = async (req, res) => {
 const store = async (req, res) => {
 
     try {
+        const uploadedFile = await uploadFileFunction(req, res, 'image', 'types_images');
+
+        await Promise.all([
+            check('name').notEmpty()
+        ]);
+
         const errors = validationResult(req);
-        if(!errors.isEmpty())
-        {
-            return res.status(400).json({ errors: errors.array() });
+        if (!errors.isEmpty()) {
+            return res.status(400).json({
+                errors: errors.array()
+            });
         }
 
+        let imagePath = null
+        if (uploadedFile == undefined) {
+            return res.status(400).json({
+                status: 400,
+                error: "Image is required"
+            })
+        }
+        imagePath = uploadedFile.destination + '/' + uploadedFile.originalname
 
         let newType = new Type({
             name: req.body.name,
+            image: imagePath,
             createdBy: req.user._id
         });
 
         await newType.save();
         res.json(newType);
-
+        
     } catch (error) {
-        res.json(internalError("", error));
+        console.log(error);
     }
+
 }
 
 const getOne = async (req, res) => {
@@ -123,4 +137,4 @@ const destroy = async (req, res) => {
         });
 }
 
-module.exports = { index, store, getOne, update, destroy, storingVlidation};
+module.exports = { index, store, getOne, update, destroy};

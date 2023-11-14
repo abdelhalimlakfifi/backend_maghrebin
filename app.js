@@ -65,7 +65,7 @@ app.use('/api/categorie', categorieRoute);
 app.use('/api/type', typeRoute);
 app.use('/api/subcategorie', subcategorie);
 app.use('/api/forgotpassword', userOtpVerification);
-app.use('/api/size');
+app.use('/api/size', sizeRoute);
 
 app.listen(port, () => {
   console.log(`Server is running`);

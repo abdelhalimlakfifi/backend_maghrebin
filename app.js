@@ -18,6 +18,7 @@ const userOtpVerification = require('./routes/backoffice/userOtpVerification.rou
 const userRoute = require('./routes/backoffice/user.route');
 const colorRoute = require('./routes/backoffice/color.route');
 const UserOtpVerefication = require('./models/userOtpVerefication.model');
+const sizeRoute = require('./routes/backoffice/size.route');
 const cron = require('node-cron');
 const path = require('path');
 
@@ -64,6 +65,7 @@ app.use('/api/categorie', categorieRoute);
 app.use('/api/type', typeRoute);
 app.use('/api/subcategorie', subcategorie);
 app.use('/api/forgotpassword', userOtpVerification);
+app.use('/api/size');
 
 app.listen(port, () => {
   console.log(`Server is running`);

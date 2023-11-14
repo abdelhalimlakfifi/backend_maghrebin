@@ -13,6 +13,10 @@ const typeSchema = new mongoose.Schema(
             require:true,
             default: true 
         },
+        image: {
+            type: String,
+            require: true
+        },
         createdBy: {
             type: mongoose.Schema.Types.ObjectId,
             ref:'User'

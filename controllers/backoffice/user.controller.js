@@ -143,7 +143,7 @@ const getOne = async (req, res) => {
             username
         } = req.params;
 
-        console.log(req.params)
+
 
         // Find user by username
         const user = await User.findOne({
@@ -156,7 +156,6 @@ const getOne = async (req, res) => {
                 }
             });
 
-        console.log(user)
 
         // Check if user exists
         if (!user) {
@@ -214,13 +213,11 @@ const search= async (req, res) => {
             filter.first_name = { $regex: new RegExp(firstName, 'i') };
         } 
 
-        console.log('Filter:', filter);
-
 
         // Querying the database
         const users = await User.find(filter);
 
-        console.log(users);
+
         res.json({ success: true, users });
     } catch (error) {
         console.error(error);
@@ -327,7 +324,7 @@ const destroy = async (req, res) => {
 
     let user = await User.findOne({ username: username });
 
-    console.log('Found User:', user);
+
 
     if(!user){
         return res.status(404).json({

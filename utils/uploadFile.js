@@ -2,8 +2,6 @@ const multer = require('multer');
 
 
 const uploadFileFunction = (req, res, fileAttribute, destination) => {
-
-    console.log("11");
     const storage = multer.diskStorage({
         destination: (req, file, cb) => {
             cb(null, `uploads/${destination}`);
@@ -24,7 +22,7 @@ const uploadFileFunction = (req, res, fileAttribute, destination) => {
             cb(null, finalFileName );
         }
     });
-    console.log("22");
+
     const fileFilter = (req, file, cb) => {
         const allowedMimeTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
     
@@ -37,7 +35,7 @@ const uploadFileFunction = (req, res, fileAttribute, destination) => {
 
 
 
-    console.log("33");
+
     return new Promise((resolve, reject) => {
         // Configure upload
         const upload = multer({
@@ -54,7 +52,7 @@ const uploadFileFunction = (req, res, fileAttribute, destination) => {
                 // An unknown error occurred when uploading
                 reject(err.message);
             } else {
-                console.log("44");
+ 
                 // Resolve the Promise with the uploaded file
                 resolve(req.file);
             }

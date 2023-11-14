@@ -9,7 +9,19 @@ const uploadFileFunction = (req, res, fileAttribute, destination) => {
             cb(null, `uploads/${destination}`);
         },
         filename: (req, file, cb) => {
-            cb(null, Date.now() + '_' + file.originalname);
+            // Extract the file extension
+            const fileExtension = file.originalname.split('.').pop();
+
+            // Replace spaces and symbols with underscores in the file name
+            const cleanedFileName = file.originalname.replace(/[\s\W]+/g, '_');
+
+            // Create a file name with the current date and time
+            const currentDate = new Date().toISOString().replace(/[-:.]/g, '_');;
+
+            // Combine the date, cleaned file name, and file extension with underscores
+            const finalFileName = currentDate + '_' + cleanedFileName + '.' + fileExtension;
+
+            cb(null, finalFileName );
         }
     });
     console.log("22");

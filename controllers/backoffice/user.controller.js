@@ -10,16 +10,14 @@ const {
 } = require('express-validator'); // Import express-validator for input validation.
 const mongoose = require('mongoose'); // Import mongoose for working with MongoDB.
 const multer = require('multer');
-const {
-    uploadFileFunction
-} = require('../../utils/uploadFile');
+const { uploadFileFunction } = require('../../utils/uploadFile');
 const bcrypt = require('bcrypt');
 
 
 
 const store = async (req, res) => {
     try {
-        const uploadedFile = await uploadFileFunction(req, res, 'profile_picture');
+        const uploadedFile = await uploadFileFunction(req, res, 'profile_picture', 'users_profile');
         await Promise.all([
             check('first_name')
             .notEmpty()

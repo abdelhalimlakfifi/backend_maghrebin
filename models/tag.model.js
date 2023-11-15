@@ -34,7 +34,21 @@ const tagSchema = new mongoose.Schema(
     },{
         timestamps: true
     }
-)
+);
+
+
+tagSchema.methods.softDelete = async function(userId){
+    try {
+        this.deletedAt = new Date();
+        this.deletedBy = userId;
+
+        await this.save()
+    }
+    catch(err){
+        console.error ('Error while removing the role:', err);
+        throw err;
+    }
+}
 
 
 

@@ -53,8 +53,44 @@ const store = async (req, res) => {
     }
 }
 
-const update = (req, res) => {
+const update = async (req, res) => {
 
+
+    try {
+        const tag = await Tag.findById(req.params.id)
+
+        console.log(tag);
+        if(!tag){
+            return res.status(404).json({
+                status: 404,
+                error: "Tag not found"
+            });
+        }
+
+        const existTag = await Tag.findOne({ name: req.body.name});
+        if(existTag && existTag._id != tag._id)
+        {
+            return res.status(400).json({
+                status: 400,
+                error: "Tag already exists"
+            });
+        }
+
+        tag.name = req.body.name ? req.body.name : tag.name;
+        tag.description = req.body.description ? req.body.description: tag.description;
+        tag.updatedBy = req.user._id;
+
+
+        await tag.save();
+        return res.status(200).json({
+            status: 200,
+            tag: tag
+        });
+
+    } catch (error) {
+        
+    }
+    return res.send("update");
 }
 
 const destroy = (req, res) => {

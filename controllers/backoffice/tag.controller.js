@@ -1,7 +1,7 @@
 const Tag = require('../../models/tag.model');
 const { internalError } = require('../../utils/500');
 const { body, validationResult } = require('express-validator');
-
+const mongoose = require('mongoose');
 
 const storingValidation = [
     body('name')
@@ -14,6 +14,15 @@ const storingValidation = [
 
 const index = async (req, res) => {
 
+
+    try {
+        const tags = await Tag.find({ deletedAt: null });
+
+        return res.json(tags);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json(internalError("Couldn't find", error));
+    }
 }
 
 const store = async (req, res) => {
@@ -93,9 +102,38 @@ const update = async (req, res) => {
     return res.send("update");
 }
 
-const destroy = (req, res) => {
+const remove = async (req, res) => {
 
+    try {
+        const id = req.params.id;
+
+        if(!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(404).json({
+                status: 404,
+                error: "Invalid id"
+            });
+        }
+
+        const tag = await Tag.findById(id);
+
+        if(!tag) {
+            return res.status(404).json({
+                status: 404,
+                error: "Tag not found"
+            });
+        }
+
+        await tag.softDelete();
+        return res.status(200).json({
+            status: 200,
+            message:"Tag deleted successfully deleted"
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json(internalError("Couldn't find", error));
+    }
 }
 
 
-module.exports = {index, store, update, destroy, storingValidation};
+module.exports = {index, store, update, remove, storingValidation};

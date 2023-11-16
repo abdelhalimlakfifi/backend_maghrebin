@@ -53,12 +53,12 @@ const productSchema = new mongoose.Schema({
         ref: 'Types',
         required: true
     }],
-    categories: {
+    categories_id: {
         type: mongoose.Schema.Types.ObjectId, // Assuming a reference to the Category model
         ref: 'Categorie',
         required: true
     },
-    sub_categorie: {
+    sub_categorie_id: {
         type: mongoose.Schema.Types.ObjectId, // Assuming a reference to the SubCategory model
         ref: 'SubCategorie',
         required: true

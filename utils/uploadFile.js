@@ -25,19 +25,21 @@ const uploadFileFunction = (req, res, fileAttribute, destination) => {
     };
 
     return new Promise((resolve, reject) => {
+
+        
         const upload = multer({
             storage,
             fileFilter,
             limits: {
                 fileSize: 2 * 1024 * 1024, // 2MB limit for each file
             },
-        }).single(fileAttribute); // '5' is the maximum number of files allowed in this example
+        }).single(fileAttribute);
 
         upload(req, res, (err) => {
             if (err) {
                 reject(err.message);
             } else {
-                resolve(req.files); // Use req.files to get an array of uploaded files
+                resolve(req.file); // Use req.files to get an array of uploaded files
             }
         });
     });
@@ -69,6 +71,9 @@ const uploadFileFunctionMultiple = (req, res, fileAttribute, destination) => {
         }
     };
 
+
+    console.log(fileAttribute);
+    console.log(req.body);
     return new Promise((resolve, reject) => {
         const upload = multer({
             storage,
@@ -80,7 +85,7 @@ const uploadFileFunctionMultiple = (req, res, fileAttribute, destination) => {
 
         upload(req, res, (err) => {
             if (err) {
-                reject(err.message);
+                reject(err);
             } else {
                 resolve(req.files); // Use req.files to get an array of uploaded files
             }

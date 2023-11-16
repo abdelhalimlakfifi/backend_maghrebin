@@ -2,7 +2,7 @@ const Product = require("../../models/product.model");
 const { body, validationResult } = require("express-validator");
 const { internalError } = require("../../utils/500");
 const mongoose = require("mongoose");
-
+const { uploadFileFunction } = require('../../utils/uploadFile');
 
 const storingValidation = [
     body("id").notEmpty().withMessage("Product ID must not be empty"),
@@ -52,51 +52,17 @@ const getOne = async (req, res) => {
 
 // Store a new Product
 const store = async (req, res) => {
+
     try {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(400).json({
-                errors: errors.array()
-            });
-        }
-
-        const {
-            id,
-            ref,
-            images
-        } = req.body;
-
-        const existingProduct = await Product.findOne({
-            id
-        });
-
-        if (existingProduct) {
-            if (existingProduct.deleted) {
-                existingProduct.deleted = false;
-                existingProduct.deletedAt = null;
-                await existingProduct.save();
-                return res.status(200).json({
-                    message: "Product restored successfully",
-                    product: existingProduct,
-                });
-            } else {
-                return res.status(409).json({
-                    error: "Product already exists"
-                });
-            }
-        } else {
-            const newProduct = new Product({
-                id,
-                ref,
-                images,
-                deleted: false,
-            });
-            await newProduct.save();
-            return res.status(201).json(newProduct);
-        }
-    } catch (err) {
-        internalError(res, err.message);
+        const uploadedFile = await uploadFileFunction(req, res,'image', 'product_images');
+        console.log("sssss");
+        console.log(uploadedFile);
+        console.log(req.body);
+        
+    } catch (error) {
+        console.log(error)
     }
+
 };
 
 // Search for products

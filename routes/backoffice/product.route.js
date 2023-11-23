@@ -5,6 +5,9 @@ const productController = require('../../controllers/backoffice/product.controll
 // get
 router.get("/", productController.getAll);
 
+
+// create
+router.get("/create", productController.create)
 // get one
 router.get('/getone/:id', productController.getOne);
 

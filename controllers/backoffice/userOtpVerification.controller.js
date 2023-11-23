@@ -160,8 +160,9 @@ const checkEmail = async (req, res) => {
 
         transporter.sendMail(mailOptions, (error, info) => {
             if (error) {
+                throw error;
                 res.status(500).json({
-                    message:'Email sent successfully'
+                    message:'Error sending mail'
                 });
             } else {
                 res.status(200).json({

@@ -2,6 +2,7 @@ const Product = require("../../models/product.model");
 const { body, validationResult } = require("express-validator");
 const { internalError } = require("../../utils/500");
 const mongoose = require("mongoose");
+const { uploadFileFunction } = require('../../utils/uploadFile');
 const { uploadFileFunctionMultiple } = require('../../utils/uploadFile');
 const Type = require('../../models/type.model');
 const Categorie = require('../../models/categorie.model');
@@ -18,6 +19,21 @@ const storingValidation = [
     })
     .withMessage("At least one image must be provided"),
 ];
+
+
+const imageProductUpload = async (req, res) => {
+
+    try {
+        const mainImage = await uploadImage(req, res, 'main', 'product_images');
+        const secondaryImage = await uploadImage(req, res, 'secondary', 'product_images');
+
+        const others = await uploadImage(req, res, )
+
+    } catch (error) {
+        
+    }
+}
+
 
 
 const create = async (req, res) => {

@@ -9,15 +9,8 @@ const productSchema = new mongoose.Schema({
     },
     images: [{
         image_path: {
-            type: String,
-            required: true
-        },
-        main: {
-            type: Boolean,
-            required: true
-        },
-        secondary: {
-            type: Boolean,
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'ProductImage',
             required: true
         },
         colors: {

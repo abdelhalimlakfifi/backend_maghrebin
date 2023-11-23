@@ -5,7 +5,15 @@ const productImage = new mongoose.Schema(
         path: {
             type:String,
             require: true
-        }
+        },
+        main: {
+            type:Boolean,
+            required: true
+        },
+        secondary: {
+            type: Boolean,
+            required: true
+        },
     },{
         timestamps: true
     }

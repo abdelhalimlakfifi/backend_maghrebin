@@ -4,7 +4,7 @@ const productImage = new mongoose.Schema(
   {
     path: {
       type: String,
-      require: true,
+      required: true,
     },
     main: {
       type: Boolean,

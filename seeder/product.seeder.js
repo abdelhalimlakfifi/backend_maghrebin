@@ -3,7 +3,7 @@ const bcrypt = require("bcrypt");
 const connectDB = require("../config/db");
 const Product = require("../models/product.model");
 const Role = require("../models/role.model");
-
+const ProductImage = require('../models/productimage.model')
 connectDB();
 
 const addDynamicProduct = async () => {
@@ -24,7 +24,7 @@ const addDynamicProduct = async () => {
     ref: "ABC123", // Replace with an actual reference
     images: [
       {
-        image_path: sampleProductImage.ObjectId(),
+        image_path: sampleProductImage._id,
         colors: "655202934a93abaffeea2e28", // exemple de color de product
       },
     ],

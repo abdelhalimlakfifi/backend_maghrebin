@@ -2,7 +2,12 @@ const Product = require("../../models/product.model");
 const { body, validationResult } = require("express-validator");
 const { internalError } = require("../../utils/500");
 const mongoose = require("mongoose");
-const { uploadFileFunction } = require('../../utils/uploadFile');
+const { uploadFileFunctionMultiple } = require('../../utils/uploadFile');
+const Type = require('../../models/type.model');
+const Categorie = require('../../models/categorie.model');
+const SubCategorie = require('../../models/subCetegorie.model');
+const Color = require('../../models/color.model');
+const Size = require('../../models/size.model');
 
 const storingValidation = [
     body("id").notEmpty().withMessage("Product ID must not be empty"),
@@ -13,6 +18,33 @@ const storingValidation = [
     })
     .withMessage("At least one image must be provided"),
 ];
+
+
+const create = async (req, res) => {
+
+
+    try {
+        const types = await Type.find();
+        const categories = await Categorie.find();
+        const subcategories = await SubCategorie.find();
+        const colors = await Color.find();
+        const sizes = await Size.find();
+
+
+        res.json({
+            'types': types,
+            'categories': categories,
+            'subcategories': subcategories,
+            'sizes': sizes,
+            'colors': colors
+        });
+
+
+    } catch (error) {
+        internalError(res, error.message);
+    }
+}
+
 
 // Get All Products
 const getAll = async (req, res) => {
@@ -54,7 +86,7 @@ const getOne = async (req, res) => {
 const store = async (req, res) => {
 
     try {
-        const uploadedFile = await uploadFileFunction(req, res,'image', 'product_images');
+        const uploadedFile = await uploadFileFunctionMultiple(req, res,'image', 'product_images');
         console.log("sssss");
         console.log(uploadedFile);
         console.log(req.body);
@@ -171,10 +203,11 @@ const remove = async (req, res) => {
 
 module.exports = {
     getAll,
+    create,
     getOne,
     store,
     search,
     update,
     remove,
-    storingValidation,
+    storingValidation
 };

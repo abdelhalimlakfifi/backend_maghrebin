@@ -1,15 +1,50 @@
 const Product = require("../../models/product.model");
 const { body, validationResult } = require("express-validator");
 const { internalError } = require("../../utils/500");
-const mongoose = require("mongoose");
-const { uploadFileFunction } = require('../../utils/uploadFile');
-const { uploadFileFunctionMultiple } = require('../../utils/uploadFile');
 const Type = require('../../models/type.model');
 const Categorie = require('../../models/categorie.model');
 const SubCategorie = require('../../models/subCetegorie.model');
 const Color = require('../../models/color.model');
 const Size = require('../../models/size.model');
+const multer = require('multer');
+const ProductImage = require('../../models/productImage.model');
 
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, `uploads/product_images`);
+    },
+    filename: (req, file, cb) => {
+        const fileExtension = file.originalname.split('.').pop();
+        const cleanedFileName = file.originalname.replace(/[\s\W]+/g, '_');
+        const currentDate = new Date().toISOString().replace(/[-:.]/g, '_');
+        const finalFileName = currentDate + '_' + cleanedFileName + '.' + fileExtension;
+        cb(null, finalFileName);
+    }
+});
+
+const fileFilter = (req, file, cb) => {
+    const allowedMimeTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+
+    if (allowedMimeTypes.includes(file.mimetype)) {
+        cb(null, true);
+    } else {
+        cb(new Error('Invalid file type. Only PNG, JPEG, JPG, and WebP images are allowed.'));
+    }
+};
+
+const upload = multer({
+    storage,
+    fileFilter,
+    limits: {
+        fileSize: 2 * 1024 * 1024, // 2MB limit for each file
+    },
+});
+
+const uploadFiles = upload.fields([
+    { name: 'main', maxCount: 1 },
+    { name: 'secondaryImage', maxCount: 1 },
+    { name: 'others', maxCount: 20 },
+]);
 const storingValidation = [
     body("id").notEmpty().withMessage("Product ID must not be empty"),
     body("ref").notEmpty().withMessage("Product ref must not be empty"),
@@ -24,13 +59,55 @@ const storingValidation = [
 const imageProductUpload = async (req, res) => {
 
     try {
-        const mainImage = await uploadImage(req, res, 'main', 'product_images');
-        const secondaryImage = await uploadImage(req, res, 'secondary', 'product_images');
 
-        const others = await uploadImage(req, res, )
+        uploadFiles(req, res, async (err) => {
+            if (err) {
+                return res.status(400).send('Error uploading files.');
+            }
+    
+            // Multer has processed the files, and they are available in req.files
+            console.log(req.files);
+
+            const mainImage = new ProductImage({
+                path: req.files.main[0].destination + '/' + req.files.secondaryImage[0].filename,
+                main: true,
+                secondary: false,
+            });
+
+            await mainImage.save();
+
+            const secondaryImage = new ProductImage({
+                path: req.files.secondaryImage[0].destination + '/' + req.files.secondaryImage[0].filename,
+                main: false,
+                secondary: true,
+            });
+            await secondaryImage.save();
+
+
+
+            const others = req.files.others.map((image) => {
+                const newPath = `${image.destination}/${image.filename}`;
+
+                return {
+                    path: newPath,
+                    main: false,
+                    secondary: false
+                }
+            })
+
+            const otherImages = await ProductImage.create(others);
+
+            res.status(200).json({
+                main: mainImage,
+                secondary: secondaryImage,
+                others: otherImages
+            });
+        });
+
 
     } catch (error) {
-        
+        console.log(error);
+        throw error
     }
 }
 
@@ -102,10 +179,9 @@ const getOne = async (req, res) => {
 const store = async (req, res) => {
 
     try {
-        const uploadedFile = await uploadFileFunctionMultiple(req, res,'image', 'product_images');
+
         console.log("sssss");
-        console.log(uploadedFile);
-        console.log(req.body);
+        
         
     } catch (error) {
         console.log(error)
@@ -225,5 +301,6 @@ module.exports = {
     search,
     update,
     remove,
+    imageProductUpload,
     storingValidation
 };

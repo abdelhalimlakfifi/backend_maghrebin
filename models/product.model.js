@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const productSchema = new mongoose.Schema({
     ref: {
         type: String,
-        required: true,
+        default: null,
         unique: true
     },
     images: [{
@@ -18,6 +18,11 @@ const productSchema = new mongoose.Schema({
         },
         secondary: {
             type: Boolean,
+            required: true
+        },
+        colors: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Color',
             required: true
         }
     }],

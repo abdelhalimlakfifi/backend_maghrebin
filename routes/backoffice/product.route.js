@@ -7,7 +7,9 @@ router.get("/", productController.getAll);
 
 
 // create
-router.get("/create", productController.create)
+router.get("/create", productController.create);
+
+router.post('/upload-images', productController.imageProductUpload)
 // get one
 router.get('/getone/:id', productController.getOne);
 

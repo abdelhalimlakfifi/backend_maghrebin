@@ -17,7 +17,10 @@ const orderSchema = new mongoose.Schema({
       price: { type: Number, required: true },
     },
   ],
-  order_date: { timestamps: true }, // Date and time when the order was placed
+  // TODO : {
+  //   timestamps: true
+  // }
+  order_date: { type: Date, default: Date.now }, // Date and time when the order was placed
   cart_total_price: { type: Number, required: true }, // Total price of the items in the cart
   // Status of the order (e.g., 'Pending', 'Shipped', 'Delivered', etc.)
   status: { type: String, required: true },

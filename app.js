@@ -22,6 +22,7 @@ const tagRoute = require("./routes/backoffice/tag.route");
 const cron = require("node-cron");
 const path = require("path");
 const customersRoutes = require("./routes/frontoffice/customer.route");
+const ordersRoutes = require("./routes/frontoffice/order.route");
 
 connectDB();
 
@@ -67,6 +68,7 @@ app.use("/api/size", sizeRoute);
 app.use("/api/tag", tagRoute);
 // app.use('/api/product', productRoute);
 app.use("/api/customer", customersRoutes);
+app.use("/api/order", ordersRoutes);
 
 app.listen(port, () => {
   console.log(`Server is running`);

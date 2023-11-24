@@ -35,23 +35,23 @@ const customers = new Schema(
             default: null,
           },
         ],
-        count: { type: Number },
+        count: { type: Number, default: null },
       },
     ],
     login_history: [
       {
-        ip: { type: String },
-        device: { type: String },
-        browser: { type: String },
-        os: { type: String },
-        created_at: { type: Date },
+        ip: { type: String, default: null },
+        device: { type: String, default: null },
+        browser: { type: String, default: null },
+        os: { type: String, default: null },
+        created_at: { type: Date, default: Date.now },
       },
     ],
 
     updateLogs: [
       {
-        field: String,
-        oldValue: String,
+        field: { type: String, default: null },
+        oldValue: { type: String, default: null },
         updatedBy: {
           type: mongoose.Schema.Types.ObjectId,
           ref: "User",

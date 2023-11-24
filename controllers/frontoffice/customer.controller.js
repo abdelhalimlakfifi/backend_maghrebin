@@ -3,75 +3,70 @@ const bcrypt = require("bcrypt");
 require("dotenv").config();
 bcryptSalt = process.env.BCRYPT_SALT;
 const Customer = require("../../models/customer.model");
+const { check, validationResult } = require("express-validator");
 const Add_Customer_Controller = async (req, res) => {
-  // Extract customer data from the request body
-  const { firstName, lastName, email, password } = req.body;
-
-  let SaltToken = crypto.randomBytes(32).toString("hex");
-  const hash = await bcrypt.hash(SaltToken, Number(bcryptSalt));
-  // Create a new customer instance
-  const newCustomer = await register_Customer(
-    firstName,
-    lastName,
-    email,
-    password,
-    hash
-  );
-
-  if (newCustomer) {
-    res.status(201).json({
-      message:
-        "Customer created successfully,Check your Email to activate your account !.",
-      data: newCustomer,
-    });
-    // activate account of customer
-
-    // const link = `${CLIENT_URL_ACTIVATE}?token=${hash}`;
-    // sendEmail(
-    //   newCustomer.email,
-    //   "Activate Account ",
-    //   {
-    //     name: newCustomer.first_name + " " + newCustomer.last_name,
-    //     link: link,
-    //   },
-    //   "../utils/email/template/requestActivateAccount.handlebars"
-    // );
-    // return link;
-  } else {
-    res.status(500).json({ message: "Customer failed" });
-  }
-};
-const register_Customer = async (
-  firstName,
-  lastName,
-  email,
-  password,
-  hash
-) => {
   try {
-    // console.log("Last Name:" + lastName);
-    // console.log("First Name:" + firstName);
-    // console.log("Password:" + password);
-    // console.log("Email:" + email);
-    // console.log("hash:" + hash);
-    const hashedPassword = await bcrypt.hash(password, Number(bcryptSalt));
+    // Validate request body
+    await Promise.all([
+      check("first_name")
+        .notEmpty()
+        .withMessage("First name is required")
+        .run(req),
+      check("last_name")
+        .notEmpty()
+        .withMessage("Last name is required")
+        .run(req),
+      check("username").notEmpty().withMessage("Username is required").run(req),
+      check("email").isEmail().withMessage("Email is required").run(req),
+      check("password")
+        .isLength({ min: 6 })
+        .withMessage("Password must be at least 6 characters long")
+        .run(req),
+    ]);
 
-    // Create a new user
-    const newUser = new Customer({
-      first_name: firstName,
-      last_name: lastName,
-      email: email,
-      password: hashedPassword,
-      token: hash, // TOken to check if account is active or not
-      // valid_account: true,
-      active: true,
+    // Check for validation errors
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ success: false, errors: errors });
+    }
+
+    const { first_name, last_name, username, email, password } = req.body;
+    // Check if email or username already exist in the database
+    const existingUser = await Customer.findOne({
+      $or: [{ email }, { username }],
     });
 
-    await newUser.save();
-    return newUser;
+    if (existingUser) {
+      // If a user with the same email or username is found, return a 403 status
+      return res
+        .status(403)
+        .json({ message: "Email or username already exists" });
+    }
+    // Create a new customer instance
+    const newCustomer = new Customer({
+      first_name,
+      last_name,
+      username,
+      email,
+      password,
+    });
+    // Activate accont here
+
+    // Save the new customer to the database
+    const savedCustomer = await newCustomer.save();
+
+    res.status(201).json({
+      success: true,
+      message: "Customer added successfully",
+      customer: savedCustomer,
+    });
   } catch (error) {
-    console.error("error :" + error);
-    return false;
+    console.error("Error adding customer:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error adding customer",
+      error: error.message,
+    });
   }
 };
 

@@ -1,10 +1,9 @@
-const crypto = require("crypto");
 const bcrypt = require("bcrypt");
 require("dotenv").config();
 bcryptSalt = process.env.BCRYPT_SALT;
 const Customer = require("../../models/customer.model");
 const { check, validationResult } = require("express-validator");
-const Add_Customer_Controller = async (req, res) => {
+const Add = async (req, res) => {
   try {
     // Validate request body
     await Promise.all([
@@ -31,31 +30,43 @@ const Add_Customer_Controller = async (req, res) => {
     }
 
     const { first_name, last_name, username, email, password } = req.body;
-    // Check if email or username already exist in the database
-    const existingUser = await Customer.findOne({
-      $or: [{ email }, { username }],
-    });
+    const errorsVali = [];
 
-    if (existingUser) {
-      // If a user with the same email or username is found, return a 403 status
-      return res
-        .status(403)
-        .json({ message: "Email or username already exists" });
+    // Check if email already exists
+    const existingEmailUser = await Customer.findOne({ email });
+    if (existingEmailUser) {
+      errorsVali.push({ field: "email", message: "Email already exists" });
     }
+
+    // Check if username already exists
+    const existingUsernameUser = await Customer.findOne({ username });
+    if (existingUsernameUser) {
+      errorsVali.push({
+        field: "username",
+        message: "Username already exists",
+      });
+    }
+
+    if (errorsVali.length > 0) {
+      // If there are errors, return a 403 status with the array of errors
+      return res.status(403).json({ errors_Validation: errorsVali });
+    }
+    const hash = await bcrypt.hash(password, Number(bcryptSalt));
+
     // Create a new customer instance
     const newCustomer = new Customer({
       first_name,
       last_name,
       username,
       email,
-      password,
+      password: hash,
     });
     // Activate accont here
 
     // Save the new customer to the database
     const savedCustomer = await newCustomer.save();
 
-    res.status(201).json({
+    res.status(200).json({
       success: true,
       message: "Customer added successfully",
       customer: savedCustomer,
@@ -71,5 +82,5 @@ const Add_Customer_Controller = async (req, res) => {
 };
 
 module.exports = {
-  Add_Customer_Controller,
+  Add,
 };

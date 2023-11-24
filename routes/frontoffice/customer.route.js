@@ -1,9 +1,7 @@
 const express = require("express");
-const {
-  Add_Customer_Controller,
-} = require("../../controllers/frontoffice/customer.controller");
+const Customer_Controller = require("../../controllers/frontoffice/customer.controller");
 const customersRoutes = express.Router();
 
-customersRoutes.post("/customer", Add_Customer_Controller);
+customersRoutes.post("/customer", Customer_Controller.Add);
 
 module.exports = customersRoutes;

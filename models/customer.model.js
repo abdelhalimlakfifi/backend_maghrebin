@@ -12,6 +12,11 @@ const customers = new Schema(
       type: String,
       required: true,
     },
+    username: {
+      type: String,
+      required: true,
+      unique: true,
+    },
     email: {
       type: String,
       required: true,
@@ -19,28 +24,60 @@ const customers = new Schema(
     },
     password: {
       type: String,
-      // required: true,
+      required: true,
     },
-    last_login: {
+    categories_clicks: [
+      {
+        categorie_id: [
+          {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Categorie",
+          },
+        ],
+        count: { type: Number },
+      },
+    ],
+    login_history: [
+      {
+        ip: { type: String },
+        device: { type: String },
+        browser: { type: String },
+        os: { type: String },
+        created_at: { type: Date },
+      },
+    ],
+
+    updateLogs: [
+      {
+        field: String,
+        oldValue: String,
+        updatedBy: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+          default: null,
+        },
+        updatedAt: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
+    passwordLastUpdated: {
       type: Date,
-      default: Date.now,
+      default: null,
     },
-    active: {
-      type: Boolean,
-      default: true,
+    passwordLastUpdatedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
     },
-    valid_account: {
-      type: Boolean,
-      default: false,
+    deletedAt: {
+      type: Date,
+      default: null,
     },
-    // },
-    // token: {
-    //   type: String,
-    //   default: "",
-    // },
-    expires: {
-      type: Number,
-      default: Date.now(),
+    deletedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
     },
   },
   {

@@ -32,6 +32,7 @@ const customers = new Schema(
           {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Categorie",
+            default: null,
           },
         ],
         count: { type: Number },
@@ -83,7 +84,6 @@ const customers = new Schema(
   {
     timestamps: true,
     createdAt: "creation_date", // Use `creation_date` to store the created date
-    updatedAt: "last_update", // and `last_update` to store the last updated date
   }
 );
 // customers.plugin(findOrCreate);

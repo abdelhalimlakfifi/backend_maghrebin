@@ -18,6 +18,7 @@ const storage = multer.diskStorage({
         const cleanedFileName = file.originalname.replace(/[\s\W]+/g, '_');
         const currentDate = new Date().toISOString().replace(/[-:.]/g, '_');
         const finalFileName = currentDate + '_' + cleanedFileName + '.' + fileExtension;
+        console.log(finalFileName);
         cb(null, finalFileName);
     }
 });
@@ -41,10 +42,15 @@ const upload = multer({
 });
 
 const uploadFiles = upload.fields([
-    { name: 'main', maxCount: 1 },
+    { name: 'main', maxCount: 5 },
     { name: 'secondaryImage', maxCount: 1 },
     { name: 'others', maxCount: 20 },
 ]);
+
+
+const uploadMulti = upload.array('others', 5);
+// const uploadFiles = upload.single('main')
+
 const storingValidation = [
     body("id").notEmpty().withMessage("Product ID must not be empty"),
     body("ref").notEmpty().withMessage("Product ref must not be empty"),
@@ -59,48 +65,53 @@ const storingValidation = [
 const imageProductUpload = async (req, res) => {
 
     try {
-
+        
         uploadFiles(req, res, async (err) => {
             if (err) {
-                return res.status(400).send('Error uploading files.');
+                console.log(err);
+                return res.s
+                tatus(400).send('Error uploading files.');
             }
     
             // Multer has processed the files, and they are available in req.files
+            console.log(req.body)
             console.log(req.files);
+            
 
-            const mainImage = new ProductImage({
-                path: req.files.main[0].destination + '/' + req.files.secondaryImage[0].filename,
-                main: true,
-                secondary: false,
-            });
+            // const mainImage = new ProductImage({
+            //     path: req.files.main.destination + '/' + req.files.secondaryImage[0].filename,
+            //     main: true,
+            //     secondary: false,
+            // });
 
-            await mainImage.save();
+            // await mainImage.save();
 
-            const secondaryImage = new ProductImage({
-                path: req.files.secondaryImage[0].destination + '/' + req.files.secondaryImage[0].filename,
-                main: false,
-                secondary: true,
-            });
-            await secondaryImage.save();
+            // const secondaryImage = new ProductImage({
+            //     path: req.files.secondaryImage[0].destination + '/' + req.files.secondaryImage[0].filename,
+            //     main: false,
+            //     secondary: true,
+            // });
+            // await secondaryImage.save();
 
 
 
-            const others = req.files.others.map((image) => {
-                const newPath = `${image.destination}/${image.filename}`;
+            // const others = req.files.others.map((image) => {
+            //     const newPath = `${image.destination}/${image.filename}`;
 
-                return {
-                    path: newPath,
-                    main: false,
-                    secondary: false
-                }
-            })
+            //     return {
+            //         path: newPath,
+            //         main: false,
+            //         secondary: false
+            //     }
+            // })
 
-            const otherImages = await ProductImage.create(others);
+            // const otherImages = await ProductImage.create(others);
 
             res.status(200).json({
-                main: mainImage,
-                secondary: secondaryImage,
-                others: otherImages
+                "ccc":"ccc"
+                // main: mainImage,
+                // secondary: secondaryImage,
+                // others: otherImages
             });
         });
 

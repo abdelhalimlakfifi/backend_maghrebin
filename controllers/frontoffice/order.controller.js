@@ -5,10 +5,12 @@ const { internalError } = require("../../utils/500"); // Import internalError ut
 const create = async (req, res) => {
   try {
     // TODO : ID of customer and get the product id after verifications of customer account
-    // const id = req.customer._id;
-    const id = "655fb40d275a49940fa7dadb";
+    const id = req.customer._id;
+    // const id = "655fb40d275a49940fa7dadb";
     // Extract product_id  from params
-    const { product_id, quantity, price, cart_total_price } = req.query;
+    // const { product_id, quantity, price, cart_total_price } = req.query;
+    const { product_id, order_items } = req.body;
+
     // console.log("product_id ", product_id);
     // console.log("price ", price);
     // console.log("quantity ", quantity);
@@ -19,19 +21,22 @@ const create = async (req, res) => {
       // If the product_id is not found, return an error
       return res.status(404).json({ message: "Product not found" });
     }
+
+    // Calculate cart_total_price
+    const cart_total_price = order_items.reduce((total, item) => {
+      return total + item.quantity * item.unit_price;
+    }, 0);
     // Create a new order
     const newOrder = new Order({
       customer_id: id,
-      order_items: [
-        {
-          product_id: product_id,
-          quantity,
-          price,
-        },
-      ],
-      order_date: new Date(),
+      order_items: order_items.map((item) => ({
+        product_id: item.product_id,
+        quantity: item.quantity,
+        unit_price: item.unit_price,
+        sum_price: item.quantity * item.unit_price,
+      })),
       cart_total_price,
-      // the satus of the order
+      // the status of the order
       status: "Pending",
     });
 
@@ -63,23 +68,19 @@ const search = async (req, res) => {
 const update = async (req, res) => {
   try {
     const orderId = req.params.id;
-    const { order_items, cart_total_price, status } = req.body;
+    const { status } = req.body;
 
-    // Find the order by ID
-    const orderToUpdate = await Order.findOne({ _id: orderId });
-
-    if (!orderToUpdate) {
+    // Find and update the order status
+    const order = await Order.findById(orderId);
+    if (!order) {
       return res.status(404).json({ error: "Order not found" });
     }
 
-    // Update the fields
-    orderToUpdate.order_items.quantity = order_items.quantity; // Replace with the desired quantity
-    orderToUpdate.order_items.price = order_items.price;
-    orderToUpdate.cart_total_price = cart_total_price;
-    orderToUpdate.status = status;
+    // Update the status field
+    order.status = status;
 
     // Save the updated order
-    const updatedOrder = await orderToUpdate.save();
+    const updatedOrder = await order.save();
 
     res.status(200).json({ success: true, order: updatedOrder });
   } catch (error) {
@@ -108,13 +109,11 @@ const deletedOrder = async (req, res) => {
       return res.status(404).json({ error: "Order not found" });
     }
 
-    res
-      .status(200)
-      .json({
-        message: "order delete success",
-        success: true,
-        order: deletedOrder,
-      });
+    res.status(200).json({
+      message: "order delete success",
+      success: true,
+      order: deletedOrder,
+    });
   } catch (error) {
     res.json(internalError("", error)); // Handle internal server error
   }

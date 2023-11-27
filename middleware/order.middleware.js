@@ -3,21 +3,13 @@ const { internalError } = require("../utils/500");
 const Order = require("../models/order.model");
 
 // Middleware for validating request body
-const validateUpdateOrder = async (req, res, next) => {
+const validateUpdateOrderStatus = async (req, res, next) => {
   try {
     await Promise.all([
-      check("order_items")
-        .isArray()
-        .withMessage("Order items must be an array")
-        .run(req),
-      check("cart_total_price")
-        .isNumeric()
-        .withMessage("Cart total price must be a numeric value")
-        .run(req),
       check("status")
         .notEmpty()
         .withMessage("Status is required")
-        .isIn(["pending", "processed", "shipped"])
+        .isIn(["pending", "delivery", "delivered", "return"])
         .withMessage("Invalid status")
         .run(req),
     ]);
@@ -29,14 +21,15 @@ const validateUpdateOrder = async (req, res, next) => {
 
     next();
   } catch (error) {
-    res.json(internalError("", error)); // Handle internal server error
+    console.error("Error validating update order status request:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 // Middleware for validating request parameters
 const validateOrderId = async (req, res, next) => {
   try {
     const orderId = req.params.id;
-// console.log("orderId ",orderId)
+    // console.log("orderId ",orderId)
     if (!/^[0-9a-fA-F]{24}$/.test(orderId)) {
       // Check if the order ID has a valid format
       return res.status(400).json({ error: "Invalid order ID format" });
@@ -56,28 +49,41 @@ const validateOrderId = async (req, res, next) => {
 const validateProductDetails = async (req, res, next) => {
   try {
     await Promise.all([
+      // Validate product_id
       check("product_id")
         .notEmpty()
         .withMessage("Product ID is required")
         .isMongoId()
         .withMessage("Invalid product ID format")
         .run(req),
-      check("quantity")
+
+      // Validate order_items
+      check("order_items")
+        .isArray()
+        .withMessage("Order items must be an array")
         .notEmpty()
-        .withMessage("Quantity is required")
-        .isInt({ min: 1 })
-        .withMessage("Quantity must be a positive integer")
-        .run(req),
-      check("price")
-        .notEmpty()
-        .withMessage("Price is required")
-        .isNumeric()
-        .withMessage("Price must be a numeric value")
-        .run(req),
-      check("cart_total_price")
-        .optional()
-        .isNumeric()
-        .withMessage("Cart total price must be a numeric value")
+        .withMessage("Order items cannot be empty")
+        .custom((value) => {
+          // Validate each order item in the array
+          value.forEach((item, index) => {
+            if (!item.product_id) {
+              throw new Error(
+                `Product ID is required for order item ${index + 1}`
+              );
+            }
+            if (
+              !item.quantity ||
+              item.quantity < 1 ||
+              !Number.isInteger(item.quantity)
+            ) {
+              throw new Error(`Invalid quantity for order item ${index + 1}`);
+            }
+            if (!item.unit_price || typeof item.unit_price !== "number") {
+              throw new Error(`Invalid price for order item ${index + 1}`);
+            }
+          });
+          return true;
+        })
         .run(req),
     ]);
 
@@ -94,6 +100,6 @@ const validateProductDetails = async (req, res, next) => {
 
 module.exports = {
   validateProductDetails,
-  validateUpdateOrder,
+  validateUpdateOrderStatus,
   validateOrderId,
 };

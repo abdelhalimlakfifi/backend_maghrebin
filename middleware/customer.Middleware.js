@@ -1,6 +1,41 @@
-const { validationResult, check } = require("express-validator");
+const { validationResult, check, body } = require("express-validator");
 const { internalError } = require("../utils/500");
 const Customer = require("../models/customer.model");
+
+const validateLogin = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+
+    await Promise.all([
+      body("email").notEmpty().isEmail().run(req),
+      body("password").notEmpty().run(req),
+    ]);
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const customer = await Customer.findOne({ email });
+
+    if (!customer) {
+      return res.status(401).json({
+        error: "Customer not found",
+      });
+    }
+
+    if (customer.deletedBy) {
+      return res.status(403).json({
+        error: "Customer account has been deactivated",
+      });
+    }
+
+    // If the customer is not deleted, proceed to the next middleware
+    next();
+  } catch (error) {
+    res.json(internalError("", error)); // Handle internal server error
+  }
+};
 const validateRegister = async (req, res, next) => {
   try {
     const { username, email } = req.body;
@@ -146,6 +181,7 @@ const searchCustomerValidation = [
 ];
 
 module.exports = {
+  validateLogin,
   validateRegister,
   customerUpdateValidation,
   searchCustomerValidation,

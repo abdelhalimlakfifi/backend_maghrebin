@@ -1,8 +1,7 @@
 const mongoose = require("mongoose");
 // const findOrCreate = require("mongoose-findorcreate");
 
-const Schema = mongoose.Schema;
-const customers = new Schema(
+const customers = new mongoose.Schema(
   {
     first_name: {
       type: String,
@@ -92,19 +91,19 @@ const customers = new Schema(
   },
   {
     timestamps: true,
-    createdAt: "creation_date", // Use `creation_date` to store the created date
+    // createdAt: "creation_date", // Use `creation_date` to store the created date
   }
 );
 // customers.plugin(findOrCreate);
-customers.methods.softDelete = async function(userid){
+customers.methods.softDelete = async function (userid) {
   try {
-      this.deletedAt = new Date();
-      this.deletedBy = userid;
-      await  this.save();
+    this.deletedAt = new Date();
+    this.deletedBy = userid;
+    await this.save();
   } catch (error) {
-      console.error('Error while removing the role:', error);
-      throw error;
+    console.error("Error while removing the role:", error);
+    throw error;
   }
-}
+};
 const Customer = mongoose.model("Customer", customers);
 module.exports = Customer;

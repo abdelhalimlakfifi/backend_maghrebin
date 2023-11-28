@@ -3,9 +3,42 @@ const crypto = require("crypto");
 const Customer = require("../../models/customer.model");
 const sendEmail = require("../../utils/email/sendEmail");
 const { internalError } = require("../../utils/500");
+const { default: mongoose } = require("mongoose");
 require("dotenv").config();
 bcryptSalt = process.env.BCRYPT_SALT;
 CLIENT_URL_ACTIVATE = process.env.CLIENT_URL_ACTIVATE;
+
+const login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const customer = await Customer.findOne({ email });
+    const isPasswordValid = await bcrypt.compare(password, customer.password);
+
+    if (!isPasswordValid) {
+      return res.status(402).json({
+        error: "Invalid password",
+      });
+    }
+
+    const token = jwt.sign(
+      {
+        id: customer._id,
+        email: customer.email,
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "1h",
+      }
+    );
+
+    return res.json({
+      token,
+    });
+  } catch (error) {
+    res.json(internalError("", error)); // Handle internal server error
+  }
+};
+
 const Add = async (req, res) => {
   try {
     const { first_name, last_name, username, email, password } = req.body;
@@ -110,26 +143,19 @@ const search = async (req, res) => {
 const destroy = async (req, res) => {
   try {
     const identifier = req.params.id;
-    let customer = null;
-    if (mongoose.Types.ObjectId.isValid(identifier)) {
-      const customer = await Customer.findById(identifier);
-    } else {
-      customer = await Customer.findOne({ username: identifier });
-    }
-
-    // Soft delete the category and respond with a success message.
-    await Customer.softDelete(req.user._id);
+    const customer = await Customer.findById(identifier);
+    await customer.softDelete(req.user._id);
     res.json({
       status: 200,
       message: "Customer deleted successfully",
     });
-    res.status(200).json({ success: true, customer });
   } catch (error) {
     res.json(internalError("", error)); // Handle internal server error
   }
 };
 
 module.exports = {
+  login,
   Add,
   Update,
   search,

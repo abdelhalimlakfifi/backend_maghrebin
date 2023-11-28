@@ -20,6 +20,7 @@ const colorRoute = require('./routes/backoffice/color.route');
 const UserOtpVerefication = require('./models/userOtpVerefication.model');
 const sizeRoute = require('./routes/backoffice/size.route');
 const tagRoute = require('./routes/backoffice/tag.route');
+const productRoute = require('./routes/backoffice/product.route')
 const cron = require('node-cron');
 const path = require('path');
 
@@ -68,6 +69,7 @@ app.use('/api/subcategorie', subcategorie);
 app.use('/api/forgotpassword', userOtpVerification);
 app.use('/api/size', sizeRoute);
 app.use('/api/tag', tagRoute);
+app.use('/api/product', productRoute);
 
 app.listen(port, () => {
   console.log(`Server is running`);

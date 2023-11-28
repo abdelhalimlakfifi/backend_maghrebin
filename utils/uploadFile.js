@@ -1,30 +1,69 @@
 const multer = require('multer');
 
-
 const uploadFileFunction = (req, res, fileAttribute, destination) => {
     const storage = multer.diskStorage({
         destination: (req, file, cb) => {
             cb(null, `uploads/${destination}`);
         },
         filename: (req, file, cb) => {
-            // Extract the file extension
             const fileExtension = file.originalname.split('.').pop();
-
-            // Replace spaces and symbols with underscores in the file name
             const cleanedFileName = file.originalname.replace(/[\s\W]+/g, '_');
-
-            // Create a file name with the current date and time
-            const currentDate = new Date().toISOString().replace(/[-:.]/g, '_');;
-
-            // Combine the date, cleaned file name, and file extension with underscores
+            const currentDate = new Date().toISOString().replace(/[-:.]/g, '_');
             const finalFileName = currentDate + '_' + cleanedFileName + '.' + fileExtension;
-
-            cb(null, finalFileName );
+            cb(null, finalFileName);
         }
     });
+
     const fileFilter = (req, file, cb) => {
         const allowedMimeTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
-    
+
+        if (allowedMimeTypes.includes(file.mimetype)) {
+            cb(null, true);
+        } else {
+            cb(new Error('Invalid file type. Only PNG, JPEG, JPG, and WebP images are allowed.'));
+        }
+    };
+
+    return new Promise((resolve, reject) => {
+
+        
+        const upload = multer({
+            storage,
+            fileFilter,
+            limits: {
+                fileSize: 2 * 1024 * 1024, // 2MB limit for each file
+            },
+        }).single(fileAttribute);
+
+        upload(req, res, (err) => {
+            if (err) {
+                reject(err.message);
+            } else {
+                resolve(req.file); // Use req.files to get an array of uploaded files
+            }
+        });
+    });
+};
+
+
+
+const uploadFileFunctionMultiple = (req, res, fileAttribute, destination) => {
+    const storage = multer.diskStorage({
+        destination: (req, file, cb) => {
+            cb(null, `uploads/${destination}`);
+        },
+        filename: (req, file, cb) => {
+            const fileExtension = file.originalname.split('.').pop();
+            const cleanedFileName = file.originalname.replace(/[\s\W]+/g, '_');
+            const currentDate = new Date().toISOString().replace(/[-:.]/g, '_');
+            const finalFileName = currentDate + '_' + cleanedFileName + '.' + fileExtension;
+            cb(null, finalFileName);
+        }
+    });
+
+    const fileFilter = (req, file, cb) => {
+        const allowedMimeTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+
         if (allowedMimeTypes.includes(file.mimetype)) {
             cb(null, true);
         } else {
@@ -33,26 +72,22 @@ const uploadFileFunction = (req, res, fileAttribute, destination) => {
     };
 
 
-
+    console.log(fileAttribute);
+    console.log(req.body);
     return new Promise((resolve, reject) => {
-        // Configure upload
         const upload = multer({
             storage,
             fileFilter,
             limits: {
-                fileSize: 2 * 1024 * 1024, // 2MB limit
+                fileSize: 2 * 1024 * 1024, // 2MB limit for each file
             },
-        }).single(fileAttribute);
+        }).array(fileAttribute, 5); // '5' is the maximum number of files allowed in this example
 
-        // Perform upload
         upload(req, res, (err) => {
             if (err) {
-                // An unknown error occurred when uploading
-                reject(err.message);
+                reject(err);
             } else {
-
-                // Resolve the Promise with the uploaded file
-                resolve(req.file);
+                resolve(req.files); // Use req.files to get an array of uploaded files
             }
         });
     });
@@ -60,4 +95,5 @@ const uploadFileFunction = (req, res, fileAttribute, destination) => {
 
 module.exports = {
     uploadFileFunction,
+    uploadFileFunctionMultiple
 };

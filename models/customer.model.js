@@ -40,11 +40,12 @@ const customers = new Schema(
     ],
     login_history: [
       {
-        ip: { type: String, default: null },
-        device: { type: String, default: null },
-        browser: { type: String, default: null },
-        os: { type: String, default: null },
-        created_at: { type: Date, default: Date.now },
+        ip: { type: String, default: null, required: true },
+        info_customer: { type: String, default: null, required: true },
+        // device: { type: String, default: null },
+        // browser: { type: String, default: null },
+        // os: { type: String, default: null },
+        // created_at: { type: Date, default: Date.now },
       },
     ],
 
@@ -63,6 +64,14 @@ const customers = new Schema(
         },
       },
     ],
+    valid_account: {
+      type: Boolean,
+      default: false,
+    },
+    activate_token: {
+      type: String,
+      default: null,
+    },
     passwordLastUpdated: {
       type: Date,
       default: null,
@@ -87,6 +96,15 @@ const customers = new Schema(
   }
 );
 // customers.plugin(findOrCreate);
-
+customers.methods.softDelete = async function(userid){
+  try {
+      this.deletedAt = new Date();
+      this.deletedBy = userid;
+      await  this.save();
+  } catch (error) {
+      console.error('Error while removing the role:', error);
+      throw error;
+  }
+}
 const Customer = mongoose.model("Customer", customers);
 module.exports = Customer;

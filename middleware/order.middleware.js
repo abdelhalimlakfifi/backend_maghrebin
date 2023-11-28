@@ -21,8 +21,7 @@ const validateUpdateOrderStatus = async (req, res, next) => {
 
     next();
   } catch (error) {
-    console.error("Error validating update order status request:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.json(internalError("", error)); // Handle internal server error
   }
 };
 // Middleware for validating request parameters

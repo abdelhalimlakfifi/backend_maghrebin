@@ -16,12 +16,14 @@ const subcategorie = require('./routes/backoffice/subcategorie.route')
 const typeRoute = require('./routes/backoffice/type.route');
 const userOtpVerification = require('./routes/backoffice/userOtpVerification.route');
 const userRoute = require('./routes/backoffice/user.route');
+const path = require('path');
 
 const UserOtpVerefication = require('./models/userOtpVerefication.model');
 const cron = require('node-cron');
 
 
 connectDB();
+app.use('/api/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use(morgan('dev'));
 app.use(express.json());

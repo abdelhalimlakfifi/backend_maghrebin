@@ -65,7 +65,7 @@ const store = async (req, res) => {
             username: req.body.username
         });
         const role = await Role.findOne({
-            role: req.body.role
+            _id: req.body.role
         });
         let alreadyError = [];
 
@@ -93,14 +93,15 @@ const store = async (req, res) => {
 
         if (alreadyError.length > 0) {
             return res.status(400).json({
-                alreadyError
+                errors: alreadyError
             })
         }
 
 
-        let imagePath = null
+        let imagePath = null;
+        console.log(uploadedFile);
         if (uploadedFile != undefined) {
-            imagePath = uploadedFile.destination + uploadedFile.originalname
+            imagePath = uploadedFile.destination + uploadedFile.filename
         }
 
 

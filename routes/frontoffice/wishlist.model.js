@@ -1,22 +1,22 @@
-// wishlistModel.js
-const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
+const express = require("express");
+const passport = require("passport");
+const { authenticateToken } = require("../../middleware/authMiddleware");
+const {
+  getCustomerWishlist,
+  postCustomerWishlist,
+  deleteCustomerProduct,
+} = require("../../controllers/frontoffice/wishlist.controller");
 
-const wishlistSchema = new Schema({
-    customer: {
-        type: Schema.Types.ObjectId,
-        ref: 'Customer'
-    },
-    products: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Product'  
-    }]
-    // if i want to get all products info
-    // products: [{
-    //     type: Schema.Types.Mixed  // Store the entire product object
-    // }]
-});
+const router = express.Router();
 
-const Wishlist = mongoose.model("Wishlist", wishlistSchema);
+// --------------------Routes for customers """DONT FORGET authenticateToken('customer-jwt'),"""
+// Get the wish list of customers
+router.get("/customer/:id", getCustomerWishlist);
 
-module.exports = Wishlist;
+// Post the wish list of customers
+router.post("/customer/:customerId/wishlist/product/:productId", postCustomerWishlist);
+
+// Delete Product from the wishlist of customers
+router.delete("/customer/:customerId/wishlist/product", deleteCustomerProduct);
+
+module.exports = router;

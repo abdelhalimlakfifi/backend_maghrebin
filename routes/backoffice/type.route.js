@@ -9,7 +9,7 @@ router.get('/', authenticateToken,permissionMiddleware('type-read'), typeControl
 router.get('/getone/:identifier', authenticateToken,permissionMiddleware('type-read'), typeController.getOne)
 router.post('/store', authenticateToken,permissionMiddleware('type-add'), typeController.store);
 router.put('/update/:identifier', authenticateToken,permissionMiddleware('type-edit'), typeController.update);
-router.delete('/delete/:identifier', authenticateToken,permissionMiddleware('type-delete'), typeController.destroy);
+router.delete('/delete', authenticateToken,permissionMiddleware('type-delete'), typeController.destroy);
 
 
 

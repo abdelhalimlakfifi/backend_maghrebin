@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 const Customer = require("../../models/customer.model");
 const sendEmail = require("../../utils/email/sendEmail");
 const { internalError } = require("../../utils/500");
-const { default: mongoose } = require("mongoose");
+const mongoose = require("mongoose");
 require("dotenv").config();
 bcryptSalt = process.env.BCRYPT_SALT;
 CLIENT_URL_ACTIVATE = process.env.CLIENT_URL_ACTIVATE;

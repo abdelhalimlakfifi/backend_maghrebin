@@ -1,4 +1,5 @@
 const express = require("express");
+const { getCustomerWishlist, postCustomerWishlist, deleteCustomerProduct } = require("../../controllers/frontoffice/wishList.controller");
 const wishListRoutes = express.Router();
 // Get the wish list of customers
 wishListRoutes.get("/:id", getCustomerWishlist);

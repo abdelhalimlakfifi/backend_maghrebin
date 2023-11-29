@@ -389,7 +389,7 @@ const passwordChanger = async (req, res) => {
 const index = async (req, res) => {
     try {
 
-        const users = await User.find()
+        const users = await User.find({ deletedAt: null })
             .populate({
                 path: 'role',
                 populate: {
@@ -398,7 +398,10 @@ const index = async (req, res) => {
                     select: 'label'
                 }
             })
+            .sort({ createdAt: -1 })
+            
             .exec();
+        
         res.json(users);
     } catch (error) {
         res.json(internalError("", error))

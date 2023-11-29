@@ -103,7 +103,18 @@ const activate = async (req, res) => {
 };
 const getAll = async (req, res) => {
   try {
-    const customers = await Customer.find();
+    const customers = await Customer.find(
+      {},
+      {
+        first_name: 1,
+        last_name: 1,
+        username: 1,
+        email: 1,
+        valid_account: 1,
+        deletedAt: 1,
+        deletedBy: 1,
+      }
+    );
     res.status(200).json({ success: true, customers });
   } catch (error) {
     res.json(internalError("", error)); // Handle internal server error

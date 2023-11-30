@@ -1,6 +1,7 @@
 const { validationResult, check, body } = require("express-validator");
 const { internalError } = require("../utils/500");
 const Customer = require("../models/customer.model");
+const { default: mongoose } = require("mongoose");
 
 const validateLogin = async (req, res, next) => {
   try {
@@ -100,41 +101,52 @@ const activateAccountValidation = [
 
 const customerUpdateValidation = async (req, res, next) => {
   try {
+    const id = req.params.id;
+    console.log("id ", id);
+    // Check if the provided ID is a valid MongoDB ObjectId
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ error: "Invalid customer ID" });
+    }
+
+    // Check if customer with the provided ID exists
+    const existingCustomer = await Customer.findById(id);
+
+    if (!existingCustomer) {
+      return res.status(404).json({ error: "Customer not found" });
+    }
+
     await Promise.all([
-      body("first_name")
-        .notEmpty()
-        .withMessage("First name is required")
-        .run(req),
-      body("last_name")
-        .notEmpty()
-        .withMessage("Last name is required")
-        .run(req),
+      body("first_name").optional().run(req),
+      body("last_name").optional().run(req),
+
       body("username")
-        .notEmpty()
-        .withMessage("Username is required")
-        .custom(async (value) => {
-          const existingUsernameUser = await Customer.findOne({
-            username: value,
-          });
-          if (
-            existingUsernameUser &&
-            existingUsernameUser._id.toString() !== req.params.customerId
-          ) {
-            throw new Error("Username already exists");
+        .optional()
+        .custom(async (value, { req }) => {
+          // If username is provided, check for uniqueness
+          if (value) {
+            const existingUsernameUser = await Customer.findOne({
+              username: value,
+            });
+            if (
+              existingUsernameUser &&
+              existingUsernameUser._id.toString() !== id
+            ) {
+              throw new Error("Username already exists");
+            }
           }
           return true;
         })
         .run(req),
+
       body("email")
-        .isEmail()
-        .withMessage("Valid email is required")
-        .custom(async (value) => {
-          const existingEmailUser = await Customer.findOne({ email: value });
-          if (
-            existingEmailUser &&
-            existingEmailUser._id.toString() !== req.params.customerId
-          ) {
-            throw new Error("Email already exists");
+        .optional()
+        .custom(async (value, { req }) => {
+          // If email is provided, check for uniqueness
+          if (value) {
+            const existingEmailUser = await Customer.findOne({ email: value });
+            if (existingEmailUser && existingEmailUser._id.toString() !== id) {
+              throw new Error("Email already exists");
+            }
           }
           return true;
         })

@@ -5,6 +5,7 @@ const Customer = require("../../models/customer.model");
 const sendEmail = require("../../utils/email/sendEmail");
 const { internalError } = require("../../utils/500");
 const mongoose = require("mongoose");
+const multer = require("multer");
 require("dotenv").config();
 bcryptSalt = process.env.BCRYPT_SALT;
 CLIENT_URL_ACTIVATE = process.env.CLIENT_URL_ACTIVATE;
@@ -106,6 +107,7 @@ const getAll = async (req, res) => {
     const customers = await Customer.find(
       {},
       {
+        _id: 1,
         first_name: 1,
         last_name: 1,
         username: 1,
@@ -124,16 +126,26 @@ const getAll = async (req, res) => {
 const Update = async (req, res) => {
   try {
     const customerId = req.params.id;
+    // console.log("customerId ", customerId);
     const { first_name, last_name, username, email } = req.body;
-
+    console.log(
+      "first_name ",
+      first_name,
+      "last_name ",
+      last_name,
+      "username ",
+      username,
+      "email ",
+      email
+    );
     // Find the customer by ID
     const existingCustomer = await Customer.findOne({ _id: customerId });
 
     // Update the fields
-    existingCustomer.first_name = first_name;
-    existingCustomer.last_name = last_name;
-    existingCustomer.username = username;
-    existingCustomer.email = email;
+    existingCustomer.first_name = first_name || existingCustomer.first_name;
+    existingCustomer.last_name = last_name || existingCustomer.last_name;
+    existingCustomer.username = username || existingCustomer.username;
+    existingCustomer.email = email || existingCustomer.email;
     // Save the updated customer
     const updatedCustomer = await existingCustomer.save();
     res.status(200).json({ success: true, customer: updatedCustomer });

@@ -9,6 +9,7 @@ const {
 } = require("../../middleware/customer.Middleware");
 const customersRoutes = express.Router();
 const { authenticateToken } = require("../../middleware/authMiddleware");
+const multer = require("multer");
 
 // GET Data Customer by id
 customersRoutes.post("/login", validateLogin, Customer.login);
@@ -21,15 +22,20 @@ customersRoutes.post("/:token", activateAccountValidation, Customer.activate);
 
 //get all customers
 customersRoutes.get("/customers", Customer.getAll);
+// Set up multer to read file object send by client
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 // Update customer route
-customersRoutes.put("/:id", customerUpdateValidation, Customer.Update);
+customersRoutes.post(
+  "/update/:id",
+  upload.any(),
+  authenticateToken,
+  customerUpdateValidation,
+  Customer.Update
+);
 // Route to search for a customer by ID
 customersRoutes.get("/:id", searchCustomerValidation, Customer.search);
 
-customersRoutes.delete(
-  "/:id",
-  authenticateToken,
-  Customer.destroy
-);
+customersRoutes.delete("/:id", authenticateToken, Customer.destroy);
 
 module.exports = customersRoutes;

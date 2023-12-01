@@ -38,12 +38,9 @@ const loginUser = async (req, res) => {
       });
     }
 
-    // Generate a JWT token containing user information for authentication.
-    const token = jwt.sign(
-      { id: user._id, username: user.username },
-      process.env.JWT_SECRET,
-      { expiresIn: "1h" }
-    );
+        // Generate a JWT token containing user information for authentication.
+        const token = jwt.sign({ id: user._id, username: user.username },
+            process.env.JWT_SECRET, { expiresIn: "8h" });
 
     return res.json({
       // userId: user._id,

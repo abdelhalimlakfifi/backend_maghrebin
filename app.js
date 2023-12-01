@@ -16,7 +16,12 @@ const subcategorie = require('./routes/backoffice/subcategorie.route')
 const typeRoute = require('./routes/backoffice/type.route');
 const userOtpVerification = require('./routes/backoffice/userOtpVerification.route');
 const userRoute = require('./routes/backoffice/user.route');
+
 const colorRoute = require('./routes/backoffice/color.route');
+
+const path = require('path');
+
+
 const UserOtpVerefication = require('./models/userOtpVerefication.model');
 const sizeRoute = require('./routes/backoffice/size.route');
 const tagRoute = require('./routes/backoffice/tag.route');
@@ -26,6 +31,7 @@ const path = require('path');
 
 
 connectDB();
+app.use('/api/uploads', express.static(path.join(__dirname, 'uploads')));
 
 
 

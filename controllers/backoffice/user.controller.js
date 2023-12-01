@@ -237,12 +237,14 @@ const update = async (req, res) => {
     try {
         const uploadedFile = await uploadFileFunction(req, res, 'profile_picture');
 
-        const { first_name, last_name, username, email} = req.body;
+        const { first_name, last_name, username, email, role, password} = req.body;
 
         const { identifier } = req.params
 
         // Find the user by username
-        const user = await User.findOne({ username: identifier });
+        // const user = await User.findOne({ username: identifier });
+        const user = await User.findById(identifier);
+
 
         // Check if the user exists
         if (!user) {
@@ -267,6 +269,14 @@ const update = async (req, res) => {
                 updatedBy: req.user._id
             });
             user.last_name = last_name;
+        }
+        if (role !== undefined && user.role !== role) {
+            user.updateLogs.push({
+                field: 'role',
+                oldValue: user.role,
+                updatedBy: req.user._id
+            });
+            user.role = role;
         }
 
         if (username !== undefined && user.username !== username) {
@@ -304,9 +314,18 @@ const update = async (req, res) => {
                 oldValue: user.profile_picture,
                 updatedBy: req.user._id
             });
-            user.profile_picture = uploadedFile.destination + uploadedFile.originalname;
+            user.profile_picture = uploadedFile.destination + uploadedFile.filename;
         }
 
+
+        if (password !== undefined ) {
+            // Check if the new email already exists for another user
+
+            const hashedNewPassword = await bcrypt.hash(password, 10);
+            user.password = hashedNewPassword;
+            user.passwordLastUpdatedBy = req.user._id; // Save the user ID of the one who changed the password
+            user.passwordLastUpdated = new Date(); // Update the passwordLastUpdated field
+        }
         //Save the updated user in the database
         await user.save();
 
@@ -328,7 +347,7 @@ const destroy = async (req, res) => {
 
     let user = await User.findOne({ username: username });
 
-    console.log('Found User:', user);
+    
 
     if(!user){
         return res.status(404).json({

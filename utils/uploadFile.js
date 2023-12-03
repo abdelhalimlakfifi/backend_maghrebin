@@ -72,8 +72,7 @@ const uploadFileFunctionMultiple = (req, res, fileAttribute, destination) => {
     };
 
 
-    console.log(fileAttribute);
-    console.log(req.body);
+    
     return new Promise((resolve, reject) => {
         const upload = multer({
             storage,

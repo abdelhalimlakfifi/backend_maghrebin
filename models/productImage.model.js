@@ -20,16 +20,7 @@ const productImage = new mongoose.Schema(
 )
 
 
-productImage.methods.softDelete = async function(userid){
-    try {
-        this.deletedAt = new Date();
-        this.deletedBy = userid;
-        await  this.save();
-    } catch (error) {
-        console.error('Error while removing the role:', error);
-        throw error;
-    }
-}
+
 
 
 const ProductImage = mongoose.model('ProductImage', productImage, "product_images");

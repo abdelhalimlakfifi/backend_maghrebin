@@ -21,18 +21,6 @@ const storingValidation = [
 ];
 
 
-const imageProductUpload = async (req, res) => {
-
-    try {
-        const mainImage = await uploadImage(req, res, 'main', 'product_images');
-        const secondaryImage = await uploadImage(req, res, 'secondary', 'product_images');
-
-        const others = await uploadImage(req, res, )
-
-    } catch (error) {
-        
-    }
-}
 
 
 
@@ -102,11 +90,11 @@ const getOne = async (req, res) => {
 const store = async (req, res) => {
 
     try {
-        const uploadedFile = await uploadFileFunctionMultiple(req, res,'image', 'product_images');
+        const uploadedFile = await uploadFileFunctionMultiple(req, res, 'image', 'product_images');
         console.log("sssss");
         console.log(uploadedFile);
         console.log(req.body);
-        
+
     } catch (error) {
         console.log(error)
     }
@@ -225,5 +213,6 @@ module.exports = {
     search,
     update,
     remove,
+    imageProductUpload,
     storingValidation
 };

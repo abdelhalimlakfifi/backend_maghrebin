@@ -213,6 +213,5 @@ module.exports = {
     search,
     update,
     remove,
-    imageProductUpload,
     storingValidation
 };

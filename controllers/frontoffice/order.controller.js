@@ -5,7 +5,7 @@ const { internalError } = require("../../utils/500"); // Import internalError ut
 const create = async (req, res) => {
   try {
     // TODO : ID of customer and get the product id after verifications of customer account
-    const id = req.user._id;
+    const id = req.customer._id;
 
     const { product_id, order_items } = req.body;
 

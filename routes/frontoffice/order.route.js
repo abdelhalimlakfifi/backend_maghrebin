@@ -5,10 +5,10 @@ const {
   validateProductDetails,
   validateUpdateOrderStatus,
 } = require("../../middleware/order.middleware");
-const { authenticateToken } = require("../../middleware/authMiddleware");
+const { authenticateToken, Customer_authenticateToken } = require("../../middleware/authMiddleware");
 const ordersRoutes = express.Router();
 // create order
-ordersRoutes.post("/order",authenticateToken, validateProductDetails, Order.create);
+ordersRoutes.post("/order",Customer_authenticateToken, validateProductDetails, Order.create);
 // get all orders
 ordersRoutes.get("/all", Order.getAll);
 // get order by id

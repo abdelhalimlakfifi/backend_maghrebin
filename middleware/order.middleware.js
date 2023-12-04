@@ -31,14 +31,12 @@ const validateOrderId = async (req, res, next) => {
     // console.log("orderId ",orderId)
     if (!/^[0-9a-fA-F]{24}$/.test(orderId)) {
       // Check if the order ID has a valid format
-      return res.status(400).json({ error: "Invalid order ID format" });
+      return res.status(400).json({ error: "Invalid Customer ID format" });
     }
 
     // Check if the order exists
-    const order = await Order.findById(orderId);
-    if (!order) {
-      return res.status(404).json({ error: "Order not found" });
-    }
+    const order = await Order.find({ customer_id: orderId });
+   
 
     next();
   } catch (error) {

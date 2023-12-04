@@ -52,9 +52,14 @@ const customers = new mongoose.Schema(
       {
         field: { type: String, default: null },
         oldValue: { type: String, default: null },
-        updatedBy: {
+        updatedByUser: {
           type: mongoose.Schema.Types.ObjectId,
           ref: "User",
+          default: null,
+        },
+        updatedByCustomer: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Customer",
           default: null,
         },
         updatedAt: {

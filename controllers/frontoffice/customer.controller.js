@@ -88,7 +88,7 @@ const Add = async (req, res) => {
 const activate = async (req, res) => {
   // const userId = req.params["id"];
 
-  const token = req.params.token;
+  const token = req.query.token;
   // console.log("token :", req.params.token);
   console.log("token : ", token);
   try {
@@ -96,7 +96,7 @@ const activate = async (req, res) => {
     console.log(" customer email : " + customer.email);
     customer.valid_account = true;
     await customer.save();
-    req.session.customer = customer;
+    // req.session.customer = customer;
     return res.status(200).json({ message: " Account is Active " });
   } catch (error) {
     res.json(internalError("", error)); // Handle internal server error
@@ -141,14 +141,61 @@ const Update = async (req, res) => {
     // Find the customer by ID
     const existingCustomer = await Customer.findOne({ _id: customerId });
 
+    // who update the customer
+    const updatedByUser = req.user ? req.user._id : null;
+    const updatedByCustomer = req.customer ? req.customer._id : null;
+
+    if (updatedByUser) {
+      var updateLog = {
+        field: "",
+        oldValue: "",
+        updatedByUser,
+      };
+    } else {
+      var updateLog = {
+        field: "",
+        oldValue: "",
+        updatedByCustomer,
+      };
+    }
+
+    console.log("existingCustomer.first_name ", existingCustomer.first_name);
+    console.log("first_name ", first_name);
+    // Check each field for changes and update the updateLogs accordingly
+    if (first_name && first_name !== existingCustomer.first_name) {
+      updateLog.field = "first_name";
+      updateLog.oldValue = existingCustomer.first_name;
+
+      existingCustomer.updateLogs.push({ ...updateLog });
+    }
+
+    if (last_name && last_name !== existingCustomer.last_name) {
+      updateLog.field = "last_name";
+      updateLog.oldValue = existingCustomer.last_name;
+      existingCustomer.updateLogs.push({ ...updateLog });
+    }
+
+    if (username && username !== existingCustomer.username) {
+      updateLog.field = "username";
+      updateLog.oldValue = existingCustomer.username;
+      existingCustomer.updateLogs.push({ ...updateLog });
+    }
+
+    if (email && email !== existingCustomer.email) {
+      updateLog.field = "email";
+      updateLog.oldValue = existingCustomer.email;
+      existingCustomer.updateLogs.push({ ...updateLog });
+    }
+
     // Update the fields
     existingCustomer.first_name = first_name || existingCustomer.first_name;
     existingCustomer.last_name = last_name || existingCustomer.last_name;
     existingCustomer.username = username || existingCustomer.username;
     existingCustomer.email = email || existingCustomer.email;
+
     // Save the updated customer
     const updatedCustomer = await existingCustomer.save();
-    res.status(200).json({ success: true, customer: updatedCustomer });
+    res.status(200).json({ success: true, data: updatedCustomer });
   } catch (error) {
     res.json(internalError("", error)); // Handle internal server error
   }
@@ -159,7 +206,7 @@ const search = async (req, res) => {
     const customerId = req.params.id;
     // Find the customer by ID
     const customer = await Customer.findById(customerId);
-    res.status(200).json({ success: true, customer });
+    res.status(200).json({ success: true, data: customer });
   } catch (error) {
     res.json(internalError("", error)); // Handle internal server error
   }

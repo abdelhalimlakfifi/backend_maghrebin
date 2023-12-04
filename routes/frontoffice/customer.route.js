@@ -18,7 +18,7 @@ customersRoutes.post("/login", validateLogin, Customer.login);
 // authenticateToken("customer-jwt"),
 customersRoutes.post("/customer", validateRegister, Customer.Add);
 // activate  account
-customersRoutes.post("/:token", activateAccountValidation, Customer.activate);
+customersRoutes.post("/active", Customer.activate);
 
 //get all customers
 customersRoutes.get("/customers", Customer.getAll);

@@ -5,13 +5,14 @@ const {
   validateProductDetails,
   validateUpdateOrderStatus,
 } = require("../../middleware/order.middleware");
+const { authenticateToken } = require("../../middleware/authMiddleware");
 const ordersRoutes = express.Router();
 // create order
 ordersRoutes.post("/order", validateProductDetails, Order.create);
 // get all orders
 ordersRoutes.get("/all", Order.getAll);
 // get order by id
-ordersRoutes.get("/:id", validateOrderId, Order.search);
+ordersRoutes.get("/:id", authenticateToken ,validateOrderId, Order.search);
 // update the status of order
 ordersRoutes.put("/:id", validateUpdateOrderStatus, Order.update);
 // Delete order route

@@ -50,13 +50,11 @@ const create = async (req, res) => {
 
 const search = async (req, res) => {
   try {
-    const orderId = req.params.id;
-    const order = await Order.findById(orderId);
-
-    if (!order) {
+    const customer_id = req.params.id;
+    const order = await Order.find({ customer_id });
+    if (!order.length) {
       return res.status(404).json({ error: "Order not found" });
     }
-
     res.status(200).json({ success: true, order });
   } catch (error) {
     console.error("Error searching for order:", error);

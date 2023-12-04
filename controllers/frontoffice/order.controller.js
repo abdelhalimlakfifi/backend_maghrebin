@@ -5,15 +5,9 @@ const { internalError } = require("../../utils/500"); // Import internalError ut
 const create = async (req, res) => {
   try {
     // TODO : ID of customer and get the product id after verifications of customer account
-    const id = req.customer._id;
-    // const id = "655fb40d275a49940fa7dadb";
-    // Extract product_id  from params
-    // const { product_id, quantity, price, cart_total_price } = req.query;
-    const { product_id, order_items } = req.body;
+    const id = req.user._id;
 
-    // console.log("product_id ", product_id);
-    // console.log("price ", price);
-    // console.log("quantity ", quantity);
+    const { product_id, order_items } = req.body;
 
     const existingProduct = await Product.findOne({ _id: product_id });
 

@@ -8,7 +8,7 @@ const {
 const { authenticateToken } = require("../../middleware/authMiddleware");
 const ordersRoutes = express.Router();
 // create order
-ordersRoutes.post("/order", validateProductDetails, Order.create);
+ordersRoutes.post("/order",authenticateToken, validateProductDetails, Order.create);
 // get all orders
 ordersRoutes.get("/all", Order.getAll);
 // get order by id

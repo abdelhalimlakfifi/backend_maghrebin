@@ -22,7 +22,7 @@ const login = async (req, res) => {
       });
     }
 
-    const token = jwt.sign(
+    const token =  jwt.sign(
       {
         id: customer._id,
         email: customer.email,
@@ -32,7 +32,6 @@ const login = async (req, res) => {
         expiresIn: "1h",
       }
     );
-
     return res.json({
       token,
     });
@@ -128,16 +127,7 @@ const Update = async (req, res) => {
     const customerId = req.params.id;
     // console.log("customerId ", customerId);
     const { first_name, last_name, username, email } = req.body;
-    console.log(
-      "first_name ",
-      first_name,
-      "last_name ",
-      last_name,
-      "username ",
-      username,
-      "email ",
-      email
-    );
+
     // Find the customer by ID
     const existingCustomer = await Customer.findOne({ _id: customerId });
 
@@ -159,8 +149,6 @@ const Update = async (req, res) => {
       };
     }
 
-    console.log("existingCustomer.first_name ", existingCustomer.first_name);
-    console.log("first_name ", first_name);
     // Check each field for changes and update the updateLogs accordingly
     if (first_name && first_name !== existingCustomer.first_name) {
       updateLog.field = "first_name";

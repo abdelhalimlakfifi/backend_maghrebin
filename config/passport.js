@@ -3,6 +3,7 @@ const passport = require("passport");
 const JwtStrategy = require("passport-jwt").Strategy;
 const ExtractJwt = require("passport-jwt").ExtractJwt;
 const User = require("../models/user.model");
+const Customer = require("../models/customer.model");
 
 // Configure options for JWT authentication strategy
 const jwtOptions = {
@@ -26,10 +27,13 @@ passport.use(
         .exec();
 
       if (!user) {
-        // If no user is found, authentication fails with no errors
-        return done(null, false);
+        const customer = await Customer.findById(jwtPayload.id);
+        if (customer) {
+          return done(null, customer);
+        } else {
+          return done(null, false);
+        }
       }
-
       // If a user is found, authentication is successful, and the user object is returned
       return done(null, user);
     } catch (error) {

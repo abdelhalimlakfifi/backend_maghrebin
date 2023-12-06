@@ -118,7 +118,6 @@ router.post("/upload-images", upload.fields([
 
 
 
-    console.log(others);
 
 
     // res.json(

@@ -9,6 +9,7 @@ const Categorie = require('../../models/categorie.model');
 const SubCategorie = require('../../models/subCetegorie.model');
 const Color = require('../../models/color.model');
 const Size = require('../../models/size.model');
+const generateUniqueId = require('generate-unique-id');
 
 const storingValidation = [
     body("id").notEmpty().withMessage("Product ID must not be empty"),
@@ -90,13 +91,69 @@ const getOne = async (req, res) => {
 const store = async (req, res) => {
 
     try {
-        const uploadedFile = await uploadFileFunctionMultiple(req, res, 'image', 'product_images');
-        console.log("sssss");
-        console.log(uploadedFile);
-        console.log(req.body);
+        // const uploadedFile = await uploadFileFunctionMultiple(req, res, 'image', 'product_images');
+        
+        const ref = generateUniqueId({
+            length: 8,
+            useLetters: true
+        });
 
+
+        let images = req.body.data.images
+        images.push(req.body.data.mainAndSecondary.main)
+        images.push(req.body.data.mainAndSecondary.secondary)
+
+        const imgs = images.map(image => {
+            console.log(image.color);
+            console.log(image._id);
+            console.log('-------------------------------------');
+
+            return {
+                image_id: image._id,
+                color: image.color
+            }
+        });
+
+        console.log(imgs);
+        // extract colors from images
+        const uniqueColors = [...new Set(imgs.filter(item => item.color).map(item => item.color))];
+
+        
+
+        const types = req.body.data.filters.types.map(type =>{
+            return type._id
+        })
+        const sizes = req.body.data.filters.sizes.map(size =>{
+            return size._id
+        })
+        const product = new Product({
+            ref: `#${ref.toUpperCase()}`,
+            images: imgs,
+            title:  req.body.data.information.title,
+            short_description: req.body.data.information.description,
+            long_description: req.body.data.information.longDescription,
+            price: req.body.data.information.price,
+            reviews: [],
+            types: types,
+            colors: uniqueColors,
+            categories_id: req.body.data.filters.categorie._id,
+            sub_categorie_id: req.body.data.filters.subcategorie._id,
+            tags: [],
+            sizes: sizes,
+            createdBy: '654cc538caa271b564bcb95a',
+        });
+        await product.save();
+        
+        res.json({
+            status: 200,
+            product: product
+        });
     } catch (error) {
-        console.log(error)
+        
+        res.json({
+            status: 500,
+            message: "Internal Server Error",
+        })
     }
 
 };

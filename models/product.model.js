@@ -8,15 +8,16 @@ const productSchema = new mongoose.Schema({
         unique: true
     },
     images: [{
-        image_path: {
+        image_id: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'ProductImage',
             required: true
         },
-        colors: {
+        color: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Color',
-            required: true
+            default: null
+            // required: true
         }
     }],
     title: {

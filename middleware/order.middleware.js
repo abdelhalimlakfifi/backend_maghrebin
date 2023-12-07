@@ -9,18 +9,19 @@ const validateUpdateOrderStatus = async (req, res, next) => {
       check("status")
         .notEmpty()
         .withMessage("Status is required")
-        .isIn(["pending", "delivery", "delivered", "return"])
+        .isIn(["Pending", "Delivered", "Shipped", "Return"])
         .withMessage("Invalid status")
         .run(req),
     ]);
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+      return res.status(400).json({ errors: errors });
     }
 
     next();
   } catch (error) {
+    console.log("error ",error)
     res.json(internalError("", error)); // Handle internal server error
   }
 };
@@ -46,13 +47,13 @@ const validateOrderId = async (req, res, next) => {
 const validateProductDetails = async (req, res, next) => {
   try {
     await Promise.all([
-      // Validate product_id
-      check("product_id")
-        .notEmpty()
-        .withMessage("Product ID is required")
-        .isMongoId()
-        .withMessage("Invalid product ID format")
-        .run(req),
+      // // Validate product_id
+      // check("product_id")
+      //   .notEmpty()
+      //   .withMessage("Product ID is required")
+      //   .isMongoId()
+      //   .withMessage("Invalid product ID format")
+      //   .run(req),
 
       // Validate order_items
       check("order_items")

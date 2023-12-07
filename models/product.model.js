@@ -2,11 +2,11 @@ const mongoose = require("mongoose");
 
 const productSchema = new mongoose.Schema(
   {
-    ref: {
-      type: String,
-      default: null,
-      unique: true,
-    },
+      ref: {
+        type: String,
+        default: null,
+        unique: true,
+      },
     images: [
       {
         image_path: {

@@ -7,14 +7,15 @@ const create = async (req, res) => {
     // TODO : ID of customer and get the product id after verifications of customer account
     const id = req.customer._id;
 
-    const { product_id, order_items } = req.body;
+    // const { product_id, order_items } = req.body;
+    const { order_items } = req.body;
 
-    const existingProduct = await Product.findOne({ _id: product_id });
+    // const existingProduct = await Product.findOne({ _id: order_items.product_id });
 
-    if (!existingProduct) {
-      // If the product_id is not found, return an error
-      return res.status(404).json({ message: "Product not found" });
-    }
+    // if (!existingProduct) {
+    //   // If the product_id is not found, return an error
+    //   return res.status(404).json({ message: "Product not found" });
+    // }
 
     // Calculate cart_total_price
     const cart_total_price = order_items.reduce((total, item) => {
@@ -45,7 +46,11 @@ const create = async (req, res) => {
 const search = async (req, res) => {
   try {
     const customer_id = req.params.id;
-    const order = await Order.find({ customer_id });
+    console.log("customer_id ",customer_id)
+    const order = await Order.find({ customer_id }).populate(
+      "order_items.product_id",
+      "ref"
+    );
     if (!order.length) {
       return res.status(404).json({ error: "Order not found" });
     }
@@ -60,8 +65,10 @@ const search = async (req, res) => {
 const update = async (req, res) => {
   try {
     const orderId = req.params.id;
+    // console.log("request body", req.body);
     const { status } = req.body;
-
+    console.log("orderId ", orderId);
+    console.log("status ", status);
     // Find and update the order status
     const order = await Order.findById(orderId);
     if (!order) {

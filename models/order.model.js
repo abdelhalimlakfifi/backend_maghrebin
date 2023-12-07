@@ -1,5 +1,14 @@
 const mongoose = require("mongoose");
-
+// Define the formatting options
+const options = {
+  year: 'numeric',
+  month: 'short',
+  day: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit',
+  second: '2-digit',
+  timeZoneName: 'short',
+};
 const orderSchema = new mongoose.Schema(
   {
     customer_id: {
@@ -28,6 +37,15 @@ const orderSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
+    toJSON: {
+      transform: function (doc, ret) {
+        // Transform the timestamps to a more readable format
+        ret.createdAt = new Date(ret.createdAt).toLocaleString('en-US', options);
+        ret.updatedAt = new Date(ret.updatedAt).toLocaleString('en-US', options);
+        delete ret.__v; // Optionally remove the __v field
+        return ret;
+      },
+    },
   }
 );
 

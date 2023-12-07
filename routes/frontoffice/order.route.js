@@ -28,9 +28,10 @@ ordersRoutes.get("/:id", authenticateToken, validateOrderId, Order.search);
 ordersRoutes.post(
   "/:id",
   upload.any(),
+  authenticateToken,
   validateUpdateOrderStatus,
   Order.update
 );
 // Delete order route
-ordersRoutes.delete("/:id", validateOrderId, Order.deletedOrder);
+ordersRoutes.delete("/:id",authenticateToken, validateOrderId, Order.deletedOrder);
 module.exports = ordersRoutes;

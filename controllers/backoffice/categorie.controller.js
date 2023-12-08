@@ -160,6 +160,7 @@ const store = async (req, res) => {
       name,
       image: imagePath,
       typeId: typeIds,
+      createdBy: req.user._id
     });
 
     await category.save();

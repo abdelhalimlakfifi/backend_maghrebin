@@ -62,7 +62,6 @@ const store = async (req, res) => {
       image: imagePath,
       active: req.body.active,
       createdBy: req.user._id, // Set createdBy to the user's ID
-      // createdBy: req.user ? req.user._id : "6551f9337992da1616afe8a0", // just for test
     });
 
     await newType.save(); // Save the newType instance to the database

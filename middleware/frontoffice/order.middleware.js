@@ -1,6 +1,6 @@
 const { validationResult, check } = require("express-validator");
-const { internalError } = require("../utils/500");
-const Order = require("../models/order.model");
+const { internalError } = require("../../utils/500");
+const Order = require("../../models/order.model");
 
 // Middleware for validating request body
 const validateUpdateOrderStatus = async (req, res, next) => {

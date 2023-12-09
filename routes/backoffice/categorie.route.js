@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const categorieController = require('../../controllers/backoffice/categorie.controller');
-const { authenticateToken } = require('../../middleware/authMiddleware');
+const { authenticateToken } = require('../../middleware/frontoffice/authMiddleware');
 const {permissionMiddleware} = require('../../middleware/backoffice/permissions.middleware');
 
 

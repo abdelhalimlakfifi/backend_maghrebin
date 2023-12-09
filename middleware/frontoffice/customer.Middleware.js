@@ -1,8 +1,11 @@
 const { validationResult, check, body } = require("express-validator");
-const { internalError } = require("../utils/500");
-const Customer = require("../models/customer.model");
+const { internalError } = require("../../utils/500");
+const Customer = require("../../models/customer.model");
 const { default: mongoose } = require("mongoose");
-
+const sendEmail = require("../../utils/email/sendEmail");
+require("dotenv").config();
+bcryptSalt = process.env.BCRYPT_SALT;
+CLIENT_URL_ACTIVATE = process.env.CLIENT_URL_ACTIVATE;
 const validateLogin = async (req, res, next) => {
   try {
     const { email, password } = req.body;
@@ -24,14 +27,29 @@ const validateLogin = async (req, res, next) => {
         error: "Customer not found",
       });
     }
-
     if (customer.deletedBy) {
       return res.status(403).json({
-        error: "Customer account has been deactivated",
+        error: "Customer account has been deleted",
       });
     }
-
-    // If the customer is not deleted, proceed to the next middleware
+    // send activate token to customer email
+    if (!customer.valid_account) {
+      const activate_token = customer.activate_token;
+      const link = `${CLIENT_URL_ACTIVATE}?token=${activate_token}`;
+     await  sendEmail(
+        customer.email,
+        "Activate Account ",
+        {
+          name: customer.first_name + " " + customer.last_name,
+          link: link,
+        },
+        "../../utils/email/templates/requestActivateAccount.handlebars"
+      );
+      return res.status(406).json({
+        error: "please activate your account , we send a link toy our email",
+        link,
+      });
+    }
     next();
   } catch (error) {
     res.json(internalError("", error)); // Handle internal server error

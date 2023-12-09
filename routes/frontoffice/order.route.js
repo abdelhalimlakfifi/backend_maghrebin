@@ -4,14 +4,14 @@ const {
   validateOrderId,
   validateProductDetails,
   validateUpdateOrderStatus,
-} = require("../../middleware/order.middleware");
+} = require("../../middleware/frontoffice/order.middleware");
 const multer = require("multer");
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 const {
   authenticateToken,
   Customer_authenticateToken,
-} = require("../../middleware/authMiddleware");
+} = require("../../middleware/frontoffice/authMiddleware");
 const ordersRoutes = express.Router();
 // create order
 ordersRoutes.post(

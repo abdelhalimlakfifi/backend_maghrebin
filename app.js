@@ -73,5 +73,5 @@ app.use("/api/order", ordersRoutes);
 app.use("/api/wishList", wishListRoutes);
 
 app.listen(port, () => {
-  console.log(`Server is running`);
+  console.log(`Server is running `,port);
 });

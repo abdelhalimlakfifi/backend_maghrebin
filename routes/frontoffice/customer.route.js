@@ -6,9 +6,11 @@ const {
   searchCustomerValidation,
   activateAccountValidation,
   validateLogin,
-} = require("../../middleware/customer.Middleware");
+} = require("../../middleware/frontoffice/customer.Middleware");
 const customersRoutes = express.Router();
-const { authenticateToken } = require("../../middleware/authMiddleware");
+const {
+  authenticateToken,
+} = require("../../middleware/frontoffice/authMiddleware");
 const multer = require("multer");
 
 // GET Data Customer by id

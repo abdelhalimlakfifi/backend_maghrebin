@@ -39,7 +39,7 @@ const sendEmail = async (email, subject, payload, template) => {
       }
     });
   } catch (error) {
-    return error;
+    console.log("error in sendEmail ", error);
   }
 };
 

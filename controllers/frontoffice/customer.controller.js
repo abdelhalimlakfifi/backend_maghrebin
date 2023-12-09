@@ -22,7 +22,7 @@ const login = async (req, res) => {
       });
     }
 
-    const token =  jwt.sign(
+    const token = jwt.sign(
       {
         id: customer._id,
         email: customer.email,
@@ -32,7 +32,7 @@ const login = async (req, res) => {
         expiresIn: "1h",
       }
     );
-    return res.json({
+    return res.status(200).json({
       token,
     });
   } catch (error) {
@@ -89,7 +89,6 @@ const activate = async (req, res) => {
 
   const token = req.query.token;
   // console.log("token :", req.params.token);
-  console.log("token : ", token);
   try {
     const customer = await Customer.findOne({ activate_token: token });
     console.log(" customer email : " + customer.email);
@@ -98,7 +97,7 @@ const activate = async (req, res) => {
     // req.session.customer = customer;
     return res.status(200).json({ message: " Account is Active " });
   } catch (error) {
-    res.json(internalError("", error)); // Handle internal server error
+    res.json(internalError("error", error)); // Handle internal server error
   }
 };
 const getAll = async (req, res) => {

@@ -136,7 +136,7 @@ const update = async (req, res) => {
   }
 };
 
-// Soft-delete a type by identifier
+// Soft-delete a type by identifier => HALIM
 // const destroy = async (req, res) => {
 //   const identifier = req.params.identifier;
 //   const userId = req.user._id;
@@ -159,7 +159,7 @@ const update = async (req, res) => {
 //   });
 // };
 
-// Soft-delete a type by identifier
+// Soft-delete a type by identifier => SOUFIANE
 const destroy = async (req, res) => {
   const identifiers = req.body.ids;
   const userId = req.user._id;

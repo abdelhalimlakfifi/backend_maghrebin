@@ -93,6 +93,7 @@ const index = async (req, res) => {
 // Define a function to store a new category. => SOUFIANE
 const store = async (req, res) => {
   try {
+    
     const uploadedFile = await uploadFileFunction(
       req,
       res,
@@ -105,10 +106,10 @@ const store = async (req, res) => {
         .notEmpty()
         .withMessage("Category name is required")
         .run(req),
-        // check('typeIds')
-        // .isArray({ min: 1 })
-        // .withMessage('At least one type ID is required')
-        // .run(req),
+        check('typeIds')
+        .isArray({ min: 1 })
+        .withMessage('At least one type ID is required')
+        .run(req),
     ]);
 
     const errors = validationResult(req);
@@ -119,8 +120,9 @@ const store = async (req, res) => {
     }
 
     const { name, typeIds } = req.body;
-
+    
     let imagePath = null;
+    
     if (uploadedFile == undefined) {
       return res.status(400).json({
         status: 400,

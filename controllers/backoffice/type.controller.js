@@ -19,7 +19,59 @@ const index = async (req, res) => {
   }
 };
 
-// Create a new type
+// Create a new type => HALIM
+// const store = async (req, res) => {
+//   try {
+//     console.log("Request body:", req.body);
+//     // Upload the file using the uploadFileFunction
+//     const uploadedFile = await uploadFileFunction(
+//       req,
+//       res,
+//       "image",
+//       "types_images"
+//     );
+
+//     // Validation using express-validator
+//     await Promise.all([
+//       check("name").notEmpty(), // Check if the 'name' field is not empty
+//     ]);
+
+//     const errors = validationResult(req); // Check for validation errors
+//     if (!errors.isEmpty()) {
+//       return res.status(400).json({
+//         errors: errors.array(), // Return validation errors if any
+//       });
+//     }
+
+//     let imagePath = null;
+
+//     // Check if an image was uploaded
+//     if (uploadedFile == undefined) {
+//       return res.status(400).json({
+//         status: 400,
+//         error: "Image is required", // Return an error if image is required but not provided
+//       });
+//     }
+
+//     // Set the imagePath to the destination and originalname of the uploaded file
+//     imagePath = uploadedFile.destination + "/" + uploadedFile.filename;
+
+//     // Create a new Type instance
+//     let newType = new Type({
+//       name: req.body.name,
+//       image: imagePath,
+//       active: req.body.active,
+//       createdBy: req.user._id, // Set createdBy to the user's ID
+//     });
+
+//     await newType.save(); // Save the newType instance to the database
+//     res.json(newType); // Send the newType as a JSON response
+//   } catch (error) {
+//     console.log(error); // Log any errors to the console
+//   }
+// };
+
+// Create a new type => SOUFIANE
 const store = async (req, res) => {
   try {
     console.log("Request body:", req.body);
@@ -72,7 +124,9 @@ const store = async (req, res) => {
     }
 
     const existingType = await Type.findOne({
-      name: req.body.name,
+      // name: req.body.name,
+      // MongoDB query to find a document with a case-insensitive match for the 'name' field
+      name: { $regex: new RegExp("^" + req.body.name + "$", "i") },
     });
 
     // If the type already exists, return a message

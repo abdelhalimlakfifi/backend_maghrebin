@@ -132,7 +132,7 @@ const store = async (req, res) => {
     imagePath = uploadedFile.destination + "/" + uploadedFile.filename;
 
     const existingDeletedCategory = await Categorie.findOne({
-      name: req.body.name,
+      name: { $regex: new RegExp("^" + req.body.name + "$", "i") },
       deletedAt: { $ne: null },
     });
 
@@ -147,7 +147,7 @@ const store = async (req, res) => {
     }
 
     const existingCategory = await Categorie.findOne({
-      name: req.body.name,
+      name: { $regex: new RegExp("^" + req.body.name + "$", "i") },
     });
 
     // If the category already exists, return a message

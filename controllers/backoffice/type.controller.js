@@ -10,9 +10,9 @@ const { uploadFileFunction } = require("../../utils/uploadFile"); // Import uplo
 const index = async (req, res) => {
   try {
     const types = await Type.find({ deletedAt: null })
-    .populate("createdBy")
-    .populate("updatedBy")
-    .populate("deletedBy"); // Retrieve all types with deletedAt set to null
+      .populate("createdBy")
+      .populate("updatedBy")
+      .populate("deletedBy"); // Retrieve all types with deletedAt set to null
     res.json(types); // Send the types as a JSON response
   } catch (error) {
     res.json(internalError("", error)); // Handle internal server error
@@ -56,6 +56,33 @@ const store = async (req, res) => {
     // Set the imagePath to the destination and originalname of the uploaded file
     imagePath = uploadedFile.destination + "/" + uploadedFile.filename;
 
+    const existingDeletedType = await Type.findOne({
+      name: req.body.name,
+      deletedAt: { $ne: null },
+    });
+
+    // If the type is deleted, restore it
+    if (existingDeletedType) {
+      await existingDeletedType.updateOne({ deletedAt: null });
+
+      return res.status(200).json({
+        message: "Type restored successfully",
+        newType: existingDeletedType,
+      });
+    }
+
+    const existingType = await Type.findOne({
+      name: req.body.name,
+    });
+
+    // If the type already exists, return a message
+    if (existingType) {
+      return res.status(201).json({
+        message: "Category already exists",
+        newType: existingType,
+      });
+    }
+
     // Create a new Type instance
     let newType = new Type({
       name: req.body.name,
@@ -65,9 +92,16 @@ const store = async (req, res) => {
     });
 
     await newType.save(); // Save the newType instance to the database
-    res.json(newType); // Send the newType as a JSON response
+
+    return res.status(200).json({
+      message: "Type saved successfully",
+      newType,
+    });
   } catch (error) {
-    console.log(error); // Log any errors to the console
+    console.error(error);
+    res.status(500).json({
+      error: "Internal Server Error",
+    });
   }
 };
 
@@ -141,7 +175,7 @@ const update = async (req, res) => {
 //   const identifier = req.params.identifier;
 //   const userId = req.user._id;
 //   // const userId = req.headers.userid; // Extract userId from the headers
-  
+
 //   let type = await Type.findById(identifier);
 
 //   // If type is not found, return a 404 error

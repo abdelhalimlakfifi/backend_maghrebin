@@ -109,7 +109,8 @@ const store = async (req, res) => {
     imagePath = uploadedFile.destination + "/" + uploadedFile.filename;
 
     const existingDeletedType = await Type.findOne({
-      name: req.body.name,
+       // MongoDB query to find a document with a case-insensitive match for the 'name' field
+      name: { $regex: new RegExp("^" + req.body.name + "$", "i") },
       deletedAt: { $ne: null },
     });
 
@@ -125,7 +126,6 @@ const store = async (req, res) => {
 
     const existingType = await Type.findOne({
       // name: req.body.name,
-      // MongoDB query to find a document with a case-insensitive match for the 'name' field
       name: { $regex: new RegExp("^" + req.body.name + "$", "i") },
     });
 

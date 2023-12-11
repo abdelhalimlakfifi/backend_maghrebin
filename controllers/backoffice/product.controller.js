@@ -76,23 +76,21 @@ const getOne = async (req, res) => {
     const product = await Product.find({ _id: id, deletedAt: null })
       .populate({
         path: "categories_id",
-        match: { deletedBy: null }, // Filter out categories with deletedBy not null
-      })
+        match: { deletedBy: null },
       .populate({
         path: "sub_categorie_id",
-        // match: { deletedBy: null }, // Filter out subcategories with deletedBy not null
-      })
+        // match: { deletedBy: null },
       .populate({
         path: "sizes",
-        match: { deletedBy: null }, // Filter out sizes with deletedBy not null
+        match: { deletedBy: null }, 
       })
       .populate({
         path: "types",
-        match: { deletedBy: null }, // Filter out types with deletedBy not null
+        match: { deletedBy: null }, 
       })
       .populate({
         path: "colors",
-        // match: { deletedBy: null }, // Filter out colors with deletedBy not null
+        // match: { deletedBy: null },
       })
       .populate({
         path: "images.image_id", // path to the ProductImage model

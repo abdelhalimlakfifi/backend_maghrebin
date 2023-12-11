@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const roleController = require('../../controllers/backoffice/roles.controller');
-const { authenticateToken } = require('../../middleware/frontoffice/authMiddleware');
+const { authenticateToken } = require('../../middleware/authMiddleware');
 const {permissionMiddleware} = require('../../middleware/backoffice/permissions.middleware');
 
 // get
@@ -21,7 +21,7 @@ router.get('/:search', permissionMiddleware('role-read'), authenticateToken, rol
 router.put('/update/:id', permissionMiddleware('role-edit'), authenticateToken, roleController.updatingValidation, roleController.update);
 
 // delete
-router.delete('/delete/:identifier',  permissionMiddleware('role-delete'), authenticateToken, roleController.destroy);
+router.delete('/delete',   authenticateToken, permissionMiddleware('role-delete'), roleController.destroy);
 
 
 module.exports=router;

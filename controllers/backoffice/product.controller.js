@@ -50,15 +50,15 @@ const getAll = async (req, res) => {
       .populate("sizes") // Assuming 'name' is the field you want to populate from the Sizes model
       .populate("types")
       .populate("colors")
-      //   .populate({
-      //     path: "images.image_id", // path to the ProductImage model
-      //     model: "ProductImage",
-      //     // match: { main: true },
-      //   })
-      //   .populate({
-      //       path: 'images.color',     // path to the Color model
-      //       model: 'Color',           // model to populate
-      //   })
+    //   .populate({
+    //     path: "images.image_id", // path to the ProductImage model
+    //     model: "ProductImage",
+    //     // match: { main: true },
+    //   })
+    //   .populate({
+    //       path: 'images.color',     // path to the Color model
+    //       model: 'Color',           // model to populate
+    //   })
       .exec();
 
     console.log(products);
@@ -74,23 +74,25 @@ const getOne = async (req, res) => {
     const { id } = req.params;
     console.log("id ", id);
     const product = await Product.find({ _id: id, deletedAt: null })
-      .populate({
-        path: "categories_id",
-        match: { deletedBy: null },
-      .populate({
-        path: "sub_categorie_id",
-        // match: { deletedBy: null },
-      .populate({
-        path: "sizes",
-        match: { deletedBy: null }, 
+    .populate({
+        path: 'categories_id',
+        match: { deletedBy: null }, // Filter out categories with deletedBy not null
       })
       .populate({
-        path: "types",
-        match: { deletedBy: null }, 
+        path: 'sub_categorie_id',
+        // match: { deletedBy: null }, // Filter out subcategories with deletedBy not null
       })
       .populate({
-        path: "colors",
-        // match: { deletedBy: null },
+        path: 'sizes',
+        match: { deletedBy: null }, // Filter out sizes with deletedBy not null
+      })
+      .populate({
+        path: 'types',
+        match: { deletedBy: null }, // Filter out types with deletedBy not null
+      })
+      .populate({
+        path: 'colors',
+        // match: { deletedBy: null }, // Filter out colors with deletedBy not null
       })
       .populate({
         path: "images.image_id", // path to the ProductImage model

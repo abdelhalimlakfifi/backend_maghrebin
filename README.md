@@ -28,15 +28,15 @@ Return Error if the user's role does not match.
 
 # Project Structure:
 ``` 
-├── config
-│   ├── db.js
-│   └── passport.js
-├── controllers
-│   ├── backoffice
-│   │   ├── admin.controller.js
-│   │   ├── authController.js
-│   │   ├── categorie.controller.js
-|   |   └── ...
+├── config\
+│   ├── db.js\
+│   └── passport.js\
+├── controllers\
+│   ├── backoffice\
+│   │   ├── admin.controller.js\
+│   │   ├── authController.js\
+│   │   ├── categorie.controller.js\
+|   |   └── ...\
 │   ├── frontoffice
 │   │   ├── customer.controller.js
 │   │   ├── order.controller.js

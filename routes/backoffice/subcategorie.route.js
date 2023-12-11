@@ -9,7 +9,7 @@ router.get('/', authenticateToken, permissionMiddleware('sub-categorie-read'), s
 router.get('/getone/:name',authenticateToken, permissionMiddleware('sub-categorie-read'), subCategorieController.getOne)
 router.post('/store', authenticateToken, permissionMiddleware('sub-categorie-add'), subCategorieController.storingValidation, subCategorieController.store);
 router.put('/update/:id', authenticateToken, permissionMiddleware('sub-categorie-edit'), subCategorieController.storingValidation, subCategorieController.update);
-router.delete('/delete/:identifier',authenticateToken, permissionMiddleware('sub-categorie-delete'), subCategorieController.storingValidation, subCategorieController.destroy);
+router.delete('/delete/',authenticateToken, permissionMiddleware('sub-categorie-delete'), subCategorieController.storingValidation, subCategorieController.destroy);
 
 
 

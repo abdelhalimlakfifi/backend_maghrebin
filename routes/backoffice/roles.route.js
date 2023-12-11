@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const roleController = require('../../controllers/backoffice/roles.controller');
-const { authenticateToken } = require('../../middleware/authMiddleware');
+const { authenticateToken } = require('../../middleware/backoffice/authMiddleware');
 const {permissionMiddleware} = require('../../middleware/backoffice/permissions.middleware');
 
 // get

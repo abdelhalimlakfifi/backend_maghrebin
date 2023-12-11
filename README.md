@@ -28,7 +28,7 @@ Return Error if the user's role does not match.
 
 # Project Structure:
 ``` 
-├── config\
+├── config
 │   ├── db.js
 │   └── passport.js
 ├── controllers

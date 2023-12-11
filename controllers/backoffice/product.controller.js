@@ -54,11 +54,28 @@ const create = async (req, res) => {
 // Get All Products
 const getAll = async (req, res) => {
     try {
-        const products = await Product.find({
-            deleted: false
-        });
+        const products = await Product.find({ deletedAt: null })
+        .populate('categories_id') // Assuming 'name' is the field you want to populate from the Category model
+        .populate('sub_categorie_id') // Assuming 'name' is the field you want to populate from the SubCategory model
+        .populate('sizes') // Assuming 'name' is the field you want to populate from the Sizes model
+        .populate('types')
+        .populate({
+            path: 'images.image_id', // path to the ProductImage model
+            model: 'ProductImage',
+            match: { 'main': true } 
+        })
+        // .populate({
+        //     path: 'images.color',     // path to the Color model
+        //     model: 'Color',           // model to populate
+        // })
+        .exec();
+
+        
+
+        console.log(products);
         res.json(products);
     } catch (err) {
+        throw err.message 
         internalError(res, err.message);
     }
 };

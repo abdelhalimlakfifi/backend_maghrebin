@@ -49,7 +49,7 @@ const productSchema = new mongoose.Schema({
 
     types: [{
         type: mongoose.Schema.Types.ObjectId, // Assuming a reference to the Types model
-        ref: 'Types',
+        ref: 'Type',
         required: true
     }],
     categories_id: {
@@ -69,12 +69,12 @@ const productSchema = new mongoose.Schema({
     }],
     sizes: [{
         type: mongoose.Schema.Types.ObjectId, // Assuming a reference to the Sizes model
-        ref: 'Sizes',
+        ref: 'Size',
         required: true
     }],
     colors: [{
         type: mongoose.Schema.Types.ObjectId, // Assuming a reference to the Colors model
-        ref: 'Colors',
+        ref: 'Color',
         required: true
     }],
     createdBy: {

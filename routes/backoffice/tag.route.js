@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { authenticateToken } = require('../../middleware/authMiddleware');
+const { authenticateToken } = require('../../middleware/frontoffice/authMiddleware');
 const {permissionMiddleware} = require('../../middleware/backoffice/permissions.middleware');
 const tagController = require('../../controllers/backoffice/tag.controller');
 

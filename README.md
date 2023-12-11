@@ -26,7 +26,7 @@ Define two authorization middlewares: authorizeAdmin and authorizeUser.
 Check the user's role and allow access if it matches the required role (admin or user).
 Return Error if the user's role does not match.
 
-=> Project Structure:
+# Project Structure:
 
 ├── config
 │   ├── db.js
@@ -79,4 +79,24 @@ Return Error if the user's role does not match.
 ├── app.js
 ├── package-lock.json
 └── package.json
+
+
+## Overview
+
+This project follows a modular structure to ensure clarity and maintainability. Here's a brief explanation of the main directories:
+
+- **config:** Configuration files, including database setup and Passport.js configuration.
+- **controllers:** Business logic, organized by backoffice and frontoffice.
+- **middleware:** Middleware functions for both backoffice and frontoffice.
+- **models:** Database models for MongoDB.
+- **routes:** API routes, organized by backoffice and frontoffice.
+- **seeder:** Seeder scripts for populating the database with initial data.
+- **utils:** Utility functions, including email templates and file upload handling.
+- **.gitignore:** Specifies files and directories to be ignored by version control.
+- **README.md:** Documentation for the backend architecture.
+- **app.js:** Main entry point for the application.
+- **package-lock.json:** Automatically generated file to lock dependencies versions.
+- **package.json:** Configuration file for Node.js project, including dependencies and scripts.
+
+Feel free to adjust the structure and content based on your specific project requirements.
 

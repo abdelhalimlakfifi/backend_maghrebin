@@ -102,7 +102,7 @@ const activate = async (req, res) => {
 const getAll = async (req, res) => {
   try {
     const customers = await Customer.find(
-      {},
+      { deletedAt: null },
       {
         _id: 1,
         first_name: 1,

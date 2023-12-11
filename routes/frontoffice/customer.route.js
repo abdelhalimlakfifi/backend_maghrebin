@@ -12,21 +12,21 @@ const {
   authenticateToken,
 } = require("../../middleware/frontoffice/authMiddleware");
 const multer = require("multer");
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
-// GET Data Customer by id
+// login Customer
 customersRoutes.post("/login", validateLogin, Customer.login);
 
 // register Customer
 // authenticateToken("customer-jwt"),
-customersRoutes.post("/customer", validateRegister, Customer.Add);
+customersRoutes.post("/customer", upload.any(), validateRegister, Customer.Add);
 // activate  account
 customersRoutes.post("/active", Customer.activate);
 
 //get all customers
 customersRoutes.get("/customers", Customer.getAll);
 // Set up multer to read file object send by client
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
 // Update customer route
 customersRoutes.post(
   "/update/:id",
@@ -35,7 +35,7 @@ customersRoutes.post(
   customerUpdateValidation,
   Customer.Update
 );
-// Route to search for a customer by ID
+// Route to search for a customer by ID // Profile of customer
 customersRoutes.get("/:id", searchCustomerValidation, Customer.search);
 
 customersRoutes.delete("/:id", authenticateToken, Customer.destroy);

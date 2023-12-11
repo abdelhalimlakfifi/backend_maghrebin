@@ -42,7 +42,7 @@ const login = async (req, res) => {
 
 const Add = async (req, res) => {
   try {
-    const { first_name, last_name, username, email, password } = req.body;
+    const { first_name, last_name, email, password } = req.body;
     const hash = await bcrypt.hash(password, Number(bcryptSalt));
     // network info of the customer
     const ip = req.ip;
@@ -54,7 +54,6 @@ const Add = async (req, res) => {
     const newCustomer = new Customer({
       first_name,
       last_name,
-      username,
       email,
       password: hash,
       activate_token,
@@ -108,7 +107,6 @@ const getAll = async (req, res) => {
         _id: 1,
         first_name: 1,
         last_name: 1,
-        username: 1,
         email: 1,
         valid_account: 1,
         deletedAt: 1,
@@ -125,7 +123,7 @@ const Update = async (req, res) => {
   try {
     const customerId = req.params.id;
     // console.log("customerId ", customerId);
-    const { first_name, last_name, username, email } = req.body;
+    const { first_name, last_name, email } = req.body;
 
     // Find the customer by ID
     const existingCustomer = await Customer.findOne({ _id: customerId });
@@ -162,12 +160,6 @@ const Update = async (req, res) => {
       existingCustomer.updateLogs.push({ ...updateLog });
     }
 
-    if (username && username !== existingCustomer.username) {
-      updateLog.field = "username";
-      updateLog.oldValue = existingCustomer.username;
-      existingCustomer.updateLogs.push({ ...updateLog });
-    }
-
     if (email && email !== existingCustomer.email) {
       updateLog.field = "email";
       updateLog.oldValue = existingCustomer.email;
@@ -177,7 +169,6 @@ const Update = async (req, res) => {
     // Update the fields
     existingCustomer.first_name = first_name || existingCustomer.first_name;
     existingCustomer.last_name = last_name || existingCustomer.last_name;
-    existingCustomer.username = username || existingCustomer.username;
     existingCustomer.email = email || existingCustomer.email;
 
     // Save the updated customer
@@ -192,7 +183,11 @@ const search = async (req, res) => {
   try {
     const customerId = req.params.id;
     // Find the customer by ID
-    const customer = await Customer.findById(customerId);
+    const customer = await Customer.findById(customerId, {
+      first_name: 1,
+      last_name: 1,
+      email: 1,
+    });
     res.status(200).json({ success: true, data: customer });
   } catch (error) {
     res.json(internalError("", error)); // Handle internal server error

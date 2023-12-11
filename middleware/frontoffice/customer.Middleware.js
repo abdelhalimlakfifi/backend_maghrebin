@@ -24,19 +24,19 @@ const validateLogin = async (req, res, next) => {
 
     if (!customer) {
       return res.status(401).json({
-        error: "Customer not found",
+        errors: "Customer not found",
       });
     }
     if (customer.deletedBy) {
       return res.status(403).json({
-        error: "Customer account has been deleted",
+        errors: "Customer account has been deleted",
       });
     }
     // send activate token to customer email
     if (!customer.valid_account) {
       const activate_token = customer.activate_token;
       const link = `${CLIENT_URL_ACTIVATE}?token=${activate_token}`;
-     await  sendEmail(
+      await sendEmail(
         customer.email,
         "Activate Account ",
         {
@@ -57,7 +57,7 @@ const validateLogin = async (req, res, next) => {
 };
 const validateRegister = async (req, res, next) => {
   try {
-    const { username, email } = req.body;
+    const { email } = req.body;
     const errorsVali = [];
 
     // Check if email is provided and already exists
@@ -70,22 +70,9 @@ const validateRegister = async (req, res, next) => {
       }
     }
 
-    // Check if username is provided and already exists
-    if (!username) {
-      errorsVali.push({ field: "username", message: "Username is required" });
-    } else {
-      const existingUsernameUser = await Customer.findOne({ username });
-      if (existingUsernameUser) {
-        errorsVali.push({
-          field: "username",
-          message: "Username already exists",
-        });
-      }
-    }
-
     // Check if there are any errors
     if (errorsVali.length > 0) {
-      return res.status(403).json({ errors_Validation: errorsVali });
+      return res.status(403).json({ errors: errorsVali });
     }
 
     // If no errors, proceed to the next middleware
@@ -123,39 +110,19 @@ const customerUpdateValidation = async (req, res, next) => {
     console.log("id ", id);
     // Check if the provided ID is a valid MongoDB ObjectId
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ error: "Invalid customer ID" });
+      return res.status(400).json({ errors: "Invalid customer ID" });
     }
 
     // Check if customer with the provided ID exists
     const existingCustomer = await Customer.findById(id);
 
     if (!existingCustomer) {
-      return res.status(404).json({ error: "Customer not found" });
+      return res.status(404).json({ errors: "Customer not found" });
     }
 
     await Promise.all([
       body("first_name").optional().run(req),
       body("last_name").optional().run(req),
-
-      body("username")
-        .optional()
-        .custom(async (value, { req }) => {
-          // If username is provided, check for uniqueness
-          if (value) {
-            const existingUsernameUser = await Customer.findOne({
-              username: value,
-            });
-            if (
-              existingUsernameUser &&
-              existingUsernameUser._id.toString() !== id
-            ) {
-              throw new Error("Username already exists");
-            }
-          }
-          return true;
-        })
-        .run(req),
-
       body("email")
         .optional()
         .custom(async (value, { req }) => {
@@ -183,32 +150,20 @@ const customerUpdateValidation = async (req, res, next) => {
     res.json(internalError("", error)); // Handle internal server error
   }
 };
-const searchCustomerValidation = [
-  check("customerId")
-    .notEmpty()
-    .withMessage("Customer ID is required")
-    .isMongoId()
-    .withMessage("Invalid Customer ID format"),
-  async (req, res, next) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
+// middleware to search for customer by id and send res.status(404).json({ error: "Customer not found" });
 
-    const customerId = req.params.customerId;
-
-    // Check if the customer exists
-    try {
-      const customer = await Customer.findById(customerId);
-      if (!customer) {
-        return res.status(404).json({ error: "Customer not found" });
-      }
-      next();
-    } catch (error) {
-      res.json(internalError("", error)); // Handle internal server error
-    }
-  },
-];
+const searchCustomerValidation = async (req, res, next) => {
+  const id = req.params.id;
+  console.log("id ", id);
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ errors: "Invalid customer ID" });
+  }
+  const existingCustomer = await Customer.findById(id);
+  if (!existingCustomer) {
+    return res.status(404).json({ errors: "Customer not found" });
+  }
+  next();
+};
 
 module.exports = {
   validateLogin,

@@ -21,16 +21,13 @@ const customersRoutes = require("./routes/frontoffice/customer.route");
 const ordersRoutes = require("./routes/frontoffice/order.route");
 const wishListRoutes = require("./routes/frontoffice/wishList.route");
 
-const UserOtpVerefication = require('./models/userOtpVerefication.model');
-const sizeRoute = require('./routes/backoffice/size.route');
-const tagRoute = require('./routes/backoffice/tag.route');
-const productRoute = require('./routes/backoffice/product.route')
-const cron = require('node-cron');
-
-
+const UserOtpVerefication = require("./models/userOtpVerefication.model");
+const sizeRoute = require("./routes/backoffice/size.route");
+const tagRoute = require("./routes/backoffice/tag.route");
+const productRoute = require("./routes/backoffice/product.route");
+const cron = require("node-cron");
 
 connectDB();
-app.use('/api/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use("/api/uploads", express.static(path.join(__dirname, "uploads")));
 
@@ -72,11 +69,11 @@ app.use("/api/subcategorie", subcategorie);
 app.use("/api/forgotpassword", userOtpVerification);
 app.use("/api/size", sizeRoute);
 app.use("/api/tag", tagRoute);
-app.use('/api/product', productRoute);
+app.use("/api/product", productRoute);
 app.use("/api/customer", customersRoutes);
 app.use("/api/order", ordersRoutes);
 app.use("/api/wishList", wishListRoutes);
 
 app.listen(port, () => {
-  console.log(`Server is running `,port);
+  console.log(`Server is running `, port);
 });

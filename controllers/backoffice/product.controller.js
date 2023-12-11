@@ -66,7 +66,7 @@ const create = async (req, res) => {
 const getAll = async (req, res) => {
     try {
         const products = await Product.find({
-            deleted: false
+            deletedAt: null
         });
         res.json(products);
     } catch (err) {

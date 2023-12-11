@@ -43,6 +43,10 @@ const login = async (req, res) => {
 const Add = async (req, res) => {
   try {
     const { first_name, last_name, email, password } = req.body;
+    console.log("First Name:", first_name);
+    console.log("Last Name:", last_name);
+    console.log("Email:", email);
+    console.log("Password:", password);
     const hash = await bcrypt.hash(password, Number(bcryptSalt));
     // network info of the customer
     const ip = req.ip;

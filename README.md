@@ -27,7 +27,7 @@ Check the user's role and allow access if it matches the required role (admin or
 Return Error if the user's role does not match.
 
 # Project Structure:
-
+``` 
 ├── config
 │   ├── db.js
 │   └── passport.js
@@ -79,7 +79,7 @@ Return Error if the user's role does not match.
 ├── app.js
 ├── package-lock.json
 └── package.json
-
+```
 
 ## Overview
 

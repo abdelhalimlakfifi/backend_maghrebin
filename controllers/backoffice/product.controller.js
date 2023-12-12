@@ -55,14 +55,46 @@ const create = async (req, res) => {
 const getAll = async (req, res) => {
     try {
         const products = await Product.find({ deletedAt: null })
-        .populate('categories_id') // Assuming 'name' is the field you want to populate from the Category model
-        .populate('sub_categorie_id') // Assuming 'name' is the field you want to populate from the SubCategory model
-        .populate('sizes') // Assuming 'name' is the field you want to populate from the Sizes model
-        .populate('types')
+        .populate({
+            path: 'categories_id',
+            transform: function(doc){
+                return doc.name
+            }
+        })
+        .populate({
+            path: 'sub_categorie_id',
+            transform: function(doc){
+                return doc.name
+            }
+        }) // Assuming 'name' is the field you want to populate from the SubCategory model
+        .populate({
+            path:'sizes',
+            transform: function(doc){
+                return doc.name
+            }
+        }) // Assuming 'name' is the field you want to populate from the Sizes model
+        .populate({
+            path: 'types',
+            transform: function(doc) {
+                return doc.name;
+            }
+        })
         .populate({
             path: 'images.image_id', // path to the ProductImage model
             model: 'ProductImage',
-            match: { 'main': true } 
+            transform: function (doc){
+                if(doc.main || doc.secondary)
+                {
+                    return doc
+                }
+                return null
+            }
+        })
+        .populate({
+            path: 'colors',
+            transform: function (doc){
+                return doc.name
+            }
         })
         // .populate({
         //     path: 'images.color',     // path to the Color model
@@ -72,7 +104,7 @@ const getAll = async (req, res) => {
 
         
 
-        console.log(products);
+        // console.log(products.images());
         res.json(products);
     } catch (err) {
         throw err.message 

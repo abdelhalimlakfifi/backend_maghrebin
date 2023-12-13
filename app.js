@@ -29,7 +29,9 @@ const cron = require("node-cron");
 
 connectDB();
 
+
 app.use("/api/uploads", express.static(path.join(__dirname, "uploads")));
+
 
 app.use(morgan("dev"));
 app.use(express.json());

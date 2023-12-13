@@ -5,22 +5,22 @@ const productSchema = new mongoose.Schema(
       ref: {
         type: String,
         default: null,
-        unique: true,
-      },
-    images: [
-      {
-        image_path: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "ProductImage",
-          required: true,
+        unique: true
+    },
+    images: [{
+        image_id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'ProductImage',
+            required: true
         },
-        colors: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "Color",
-          required: true,
-        },
-      },
-    ],
+        color: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Color',
+            default: null
+            // required: true
+        }
+    }],
+
     title: {
       type: String,
       required: true,
@@ -53,10 +53,11 @@ const productSchema = new mongoose.Schema(
     types: [
       {
         type: mongoose.Schema.Types.ObjectId, // Assuming a reference to the Types model
-        ref: "Types",
-        required: true,
-      },
-    ],
+
+        ref: 'Type',
+        required: true
+    }],
+
     categories_id: {
       type: mongoose.Schema.Types.ObjectId, // Assuming a reference to the Category model
       ref: "Categorie",
@@ -77,17 +78,14 @@ const productSchema = new mongoose.Schema(
     sizes: [
       {
         type: mongoose.Schema.Types.ObjectId, // Assuming a reference to the Sizes model
-        ref: "Sizes",
-        required: true,
-      },
-    ],
-    colors: [
-      {
+        ref: 'Size',
+        required: true
+    }],
+    colors: [{
         type: mongoose.Schema.Types.ObjectId, // Assuming a reference to the Colors model
-        ref: "Colors",
-        required: true,
-      },
-    ],
+        ref: 'Color',
+        required: true
+    }],
     createdBy: {
       type: mongoose.Schema.Types.ObjectId, // Assuming a reference to the User model
       ref: "User",

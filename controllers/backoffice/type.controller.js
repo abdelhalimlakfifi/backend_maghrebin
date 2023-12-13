@@ -10,16 +10,68 @@ const { uploadFileFunction } = require("../../utils/uploadFile"); // Import uplo
 const index = async (req, res) => {
   try {
     const types = await Type.find({ deletedAt: null })
-    .populate("createdBy")
-    .populate("updatedBy")
-    .populate("deletedBy"); // Retrieve all types with deletedAt set to null
+      .populate("createdBy")
+      .populate("updatedBy")
+      .populate("deletedBy"); // Retrieve all types with deletedAt set to null
     res.json(types); // Send the types as a JSON response
   } catch (error) {
     res.json(internalError("", error)); // Handle internal server error
   }
 };
 
-// Create a new type
+// Create a new type => HALIM
+// const store = async (req, res) => {
+//   try {
+//     console.log("Request body:", req.body);
+//     // Upload the file using the uploadFileFunction
+//     const uploadedFile = await uploadFileFunction(
+//       req,
+//       res,
+//       "image",
+//       "types_images"
+//     );
+
+//     // Validation using express-validator
+//     await Promise.all([
+//       check("name").notEmpty(), // Check if the 'name' field is not empty
+//     ]);
+
+//     const errors = validationResult(req); // Check for validation errors
+//     if (!errors.isEmpty()) {
+//       return res.status(400).json({
+//         errors: errors.array(), // Return validation errors if any
+//       });
+//     }
+
+//     let imagePath = null;
+
+//     // Check if an image was uploaded
+//     if (uploadedFile == undefined) {
+//       return res.status(400).json({
+//         status: 400,
+//         error: "Image is required", // Return an error if image is required but not provided
+//       });
+//     }
+
+//     // Set the imagePath to the destination and originalname of the uploaded file
+//     imagePath = uploadedFile.destination + "/" + uploadedFile.filename;
+
+//     // Create a new Type instance
+//     let newType = new Type({
+//       name: req.body.name,
+//       image: imagePath,
+//       active: req.body.active,
+//       createdBy: req.user._id, // Set createdBy to the user's ID
+//     });
+
+//     await newType.save(); // Save the newType instance to the database
+//     res.json(newType); // Send the newType as a JSON response
+//   } catch (error) {
+//     console.log(error); // Log any errors to the console
+//   }
+// };
+
+// Create a new type => SOUFIANE
 const store = async (req, res) => {
   try {
     console.log("Request body:", req.body);
@@ -56,19 +108,54 @@ const store = async (req, res) => {
     // Set the imagePath to the destination and originalname of the uploaded file
     imagePath = uploadedFile.destination + "/" + uploadedFile.filename;
 
+    const existingDeletedType = await Type.findOne({
+       // MongoDB query to find a document with a case-insensitive match for the 'name' field
+      name: { $regex: new RegExp("^" + req.body.name + "$", "i") },
+      deletedAt: { $ne: null },
+    });
+
+    // If the type is deleted, restore it
+    if (existingDeletedType) {
+      await existingDeletedType.updateOne({ deletedAt: null });
+
+      return res.status(200).json({
+        message: "Type restored successfully",
+        newType: existingDeletedType,
+      });
+    }
+
+    const existingType = await Type.findOne({
+      // name: req.body.name,
+      name: { $regex: new RegExp("^" + req.body.name + "$", "i") },
+    });
+
+    // If the type already exists, return a message
+    if (existingType) {
+      return res.status(201).json({
+        message: "Category already exists",
+        newType: existingType,
+      });
+    }
+
     // Create a new Type instance
     let newType = new Type({
       name: req.body.name,
       image: imagePath,
       active: req.body.active,
       createdBy: req.user._id, // Set createdBy to the user's ID
-      // createdBy: req.user ? req.user._id : "6551f9337992da1616afe8a0", // just for test
     });
 
     await newType.save(); // Save the newType instance to the database
-    res.json(newType); // Send the newType as a JSON response
+
+    return res.status(200).json({
+      message: "Type saved successfully",
+      newType,
+    });
   } catch (error) {
-    console.log(error); // Log any errors to the console
+    console.error(error);
+    res.status(500).json({
+      error: "Internal Server Error",
+    });
   }
 };
 
@@ -137,12 +224,12 @@ const update = async (req, res) => {
   }
 };
 
-// Soft-delete a type by identifier
+// Soft-delete a type by identifier => HALIM
 // const destroy = async (req, res) => {
 //   const identifier = req.params.identifier;
 //   const userId = req.user._id;
 //   // const userId = req.headers.userid; // Extract userId from the headers
-  
+
 //   let type = await Type.findById(identifier);
 
 //   // If type is not found, return a 404 error
@@ -160,7 +247,7 @@ const update = async (req, res) => {
 //   });
 // };
 
-// Soft-delete a type by identifier
+// Soft-delete a type by identifier => SOUFIANE
 const destroy = async (req, res) => {
   const identifiers = req.body.ids;
   const userId = req.user._id;

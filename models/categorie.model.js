@@ -16,11 +16,11 @@ const categorieSchema = new mongoose.Schema(
             type: String,
             required: true
         },
-        active:{
-            type: Boolean,
-            require:true,
-            default: true
-        },
+        // active:{
+        //     type: Boolean,
+        //     require:true,
+        //     default: true
+        // },
         createdBy: {
             type: mongoose.Schema.Types.ObjectId,
             ref:'User'

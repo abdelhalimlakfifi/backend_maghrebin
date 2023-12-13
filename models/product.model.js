@@ -1,8 +1,8 @@
 const mongoose = require("mongoose");
 
-
-const productSchema = new mongoose.Schema({
-    ref: {
+const productSchema = new mongoose.Schema(
+  {
+      ref: {
         type: String,
         default: null,
         unique: true
@@ -20,54 +20,63 @@ const productSchema = new mongoose.Schema({
             // required: true
         }
     }],
+
     title: {
-        type: String,
-        required: true
+      type: String,
+      required: true,
     },
     short_description: {
-        type: String,
-        required: true
+      type: String,
+      required: true,
     },
     long_description: {
-        type: String,
-        default: null,
+      type: String,
+      default: null,
     },
     price: {
-        type: Number,
-        required: true
+      type: Number,
+      required: true,
     },
-    reviews: [{
+    reviews: [
+      {
         rating: {
-            type: Number,
-            required: true
+          type: Number,
+          required: true,
         },
         customer: {
-            type: String, // Assuming a reference to the Customer model
-            required: true
-        }
-    }],
+          type: String, // Assuming a reference to the Customer model
+          required: true,
+        },
+      },
+    ],
 
-    types: [{
+    types: [
+      {
         type: mongoose.Schema.Types.ObjectId, // Assuming a reference to the Types model
+
         ref: 'Type',
         required: true
     }],
+
     categories_id: {
-        type: mongoose.Schema.Types.ObjectId, // Assuming a reference to the Category model
-        ref: 'Categorie',
-        required: true
+      type: mongoose.Schema.Types.ObjectId, // Assuming a reference to the Category model
+      ref: "Categorie",
+      required: true,
     },
     sub_categorie_id: {
-        type: mongoose.Schema.Types.ObjectId, // Assuming a reference to the SubCategory model
-        ref: 'SubCategorie',
-        required: true
+      type: mongoose.Schema.Types.ObjectId, // Assuming a reference to the SubCategory model
+      ref: "SubCategorie",
+      required: true,
     },
-    tags: [{
+    tags: [
+      {
         type: mongoose.Schema.Types.ObjectId, // Assuming a reference to the Tags model
-        ref: 'Tags',
-        required: true
-    }],
-    sizes: [{
+        ref: "Tags",
+        required: true,
+      },
+    ],
+    sizes: [
+      {
         type: mongoose.Schema.Types.ObjectId, // Assuming a reference to the Sizes model
         ref: 'Size',
         required: true
@@ -78,36 +87,37 @@ const productSchema = new mongoose.Schema({
         required: true
     }],
     createdBy: {
-        type: mongoose.Schema.Types.ObjectId, // Assuming a reference to the User model
-        ref: 'User',
-        required: true
+      type: mongoose.Schema.Types.ObjectId, // Assuming a reference to the User model
+      ref: "User",
+      required: true,
     },
-    updateLogs: [{
+    updateLogs: [
+      {
         field: String,
         oldValue: String,
         updatedBy: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'User'
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
         },
         updatedAt: {
-            type: Date,
-        }
-    }],
+          type: Date,
+        },
+      },
+    ],
     deletedBy: {
-        type: mongoose.Schema.Types.ObjectId, // Assuming a reference to the User model
-        ref: 'User',
-        default: null
+      type: mongoose.Schema.Types.ObjectId, // Assuming a reference to the User model
+      ref: "User",
+      default: null,
     },
     deletedAt: {
-        type: Date,
-        default: null
+      type: Date,
+      default: null,
     },
-},
-{
-    timestamps: true
-});
-
-
+  },
+  {
+    timestamps: true,
+  }
+);
 
 const Product = mongoose.model("Product", productSchema);
 

@@ -104,7 +104,7 @@ const getAll = async (req, res) => {
 
         
 
-        // console.log(products.images());
+        
         res.json(products);
     } catch (err) {
         throw err.message 

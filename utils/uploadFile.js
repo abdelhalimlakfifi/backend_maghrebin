@@ -5,7 +5,8 @@ const uploadFileFunction = (req, res, fileAttribute, destination) => {
         destination: (req, file, cb) => {
             cb(null, `uploads/${destination}`);
         },
-        filename: (req, file, cb) => {
+        filename: (req, file, cb) => { 
+            // Extract the file extension
             const fileExtension = file.originalname.split('.').pop();
             const cleanedFileName = file.originalname.replace(/[\s\W]+/g, '_');
             const currentDate = new Date().toISOString().replace(/[-:.]/g, '_');

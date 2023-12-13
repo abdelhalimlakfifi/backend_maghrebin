@@ -1,7 +1,7 @@
 const express = require('express');
 const router  = express.Router();
 const userController = require('../../controllers/backoffice/user.controller');
-const { authenticateToken } = require('../../middleware/authMiddleware');
+const { authenticateToken } = require('../../middleware/frontoffice/authMiddleware');
 const {permissionMiddleware} = require('../../middleware/backoffice/permissions.middleware');
 
 const multer = require('multer')

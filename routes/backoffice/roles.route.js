@@ -1,27 +1,61 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const roleController = require('../../controllers/backoffice/roles.controller');
-const { authenticateToken } = require('../../middleware/frontoffice/authMiddleware');
-const {permissionMiddleware} = require('../../middleware/backoffice/permissions.middleware');
+const roleController = require("../../controllers/backoffice/roles.controller");
+const {
+  authenticateToken,
+} = require("../../middleware/backoffice/authMiddleware");
+const {
+  permissionMiddleware,
+} = require("../../middleware/backoffice/permissions.middleware");
 
 // get
-router.get("/", authenticateToken, permissionMiddleware('role-read'), roleController.getAll);
+router.get(
+  "/",
+  authenticateToken,
+  permissionMiddleware("role-read"),
+  roleController.getAll
+);
 
 // Post
-router.post('/store', authenticateToken, permissionMiddleware('role-add'),roleController.storingValidation, roleController.store);
+router.post(
+  "/store",
+  authenticateToken,
+  permissionMiddleware("role-add"),
+  roleController.storingValidation,
+  roleController.store
+);
 
 // get one
-router.get('/getone/:rolename', permissionMiddleware('role-read'), authenticateToken, roleController.getOne);
-
+router.get(
+  "/getone/:rolename",
+  authenticateToken,
+  permissionMiddleware("role-read"),
+  roleController.getOne
+);
 
 // search
-router.get('/:search', permissionMiddleware('role-read'), authenticateToken, roleController.search);
+router.get(
+  "/:search",
+  authenticateToken,
+  permissionMiddleware("role-read"),
+  roleController.search
+);
 
 // update
-router.put('/update/:id', permissionMiddleware('role-edit'), authenticateToken, roleController.updatingValidation, roleController.update);
+router.put(
+  "/update/:id",
+  authenticateToken,
+  permissionMiddleware("role-edit"),
+  roleController.updatingValidation,
+  roleController.update
+);
 
 // delete
-router.delete('/delete/:identifier',  permissionMiddleware('role-delete'), authenticateToken, roleController.destroy);
+router.delete(
+  "/delete",
+  authenticateToken,
+  permissionMiddleware("role-delete"),
+  roleController.destroy
+);
 
-
-module.exports=router;
+module.exports = router;

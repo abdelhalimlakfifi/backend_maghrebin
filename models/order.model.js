@@ -1,13 +1,13 @@
 const mongoose = require("mongoose");
 // Define the formatting options
 const options = {
-  year: 'numeric',
-  month: 'short',
-  day: 'numeric',
-  hour: '2-digit',
-  minute: '2-digit',
-  second: '2-digit',
-  timeZoneName: 'short',
+  year: "numeric",
+  month: "short",
+  day: "numeric",
+  hour: "2-digit",
+  minute: "2-digit",
+  second: "2-digit",
+  timeZoneName: "short",
 };
 const orderSchema = new mongoose.Schema(
   {
@@ -28,6 +28,24 @@ const orderSchema = new mongoose.Schema(
         sum_price: { type: Number, required: true },
       },
     ],
+    ref: {
+      type: Number,
+      unique: true, // Ensure uniqueness of the ref field
+      required: true,
+    },
+    address: {
+      type: String,
+      required: true,
+    },
+    postalCode: {
+      type: String,
+      required: true,
+    },
+    city: {
+      type: String,
+      required: true,
+    },
+
     // TODO : {
     //   timestamps: true
     // }
@@ -40,8 +58,14 @@ const orderSchema = new mongoose.Schema(
     toJSON: {
       transform: function (doc, ret) {
         // Transform the timestamps to a more readable format
-        ret.createdAt = new Date(ret.createdAt).toLocaleString('en-US', options);
-        ret.updatedAt = new Date(ret.updatedAt).toLocaleString('en-US', options);
+        ret.createdAt = new Date(ret.createdAt).toLocaleString(
+          "en-US",
+          options
+        );
+        ret.updatedAt = new Date(ret.updatedAt).toLocaleString(
+          "en-US",
+          options
+        );
         delete ret.__v; // Optionally remove the __v field
         return ret;
       },

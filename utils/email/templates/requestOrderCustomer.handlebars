@@ -1,0 +1,30 @@
+<html>
+
+  <head>
+    <style>
+      /* Add your styles here */
+    </style>
+  </head>
+
+  <body>
+    <p>Dear {{name}},</p>
+    <p>Thank you for placing an order with Maghribian Store!</p>
+    <p>We welcome you as our valued customer and look forward to serving you
+      again.</p>
+    <p>Here are the details of your order:</p>
+
+    <!-- Loop through the order items and display relevant information -->
+    <ul>
+      {{#each order_items}}
+        <li> - Quantity: {{quantity}} - Price: ${{unit_price}}</li>
+      {{/each}}
+    </ul>
+
+
+    <p>Your order reference: {{ref}}</p>
+
+    <p>Thank you for choosing Maghribian Store. If you have any questions or
+      concerns, please feel free to contact us.</p>
+  </body>
+
+</html>
